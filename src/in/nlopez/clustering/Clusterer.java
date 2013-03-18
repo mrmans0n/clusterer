@@ -5,6 +5,7 @@ import android.graphics.Point;
 import android.os.AsyncTask;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -32,7 +33,7 @@ public class Clusterer {
 	}
 
 	GoogleMap.OnCameraChangeListener cameraChanged = new GoogleMap.OnCameraChangeListener() {
-		
+
 		@Override
 		public void onCameraChange(CameraPosition cameraPosition) {
 			if (oldZoomValue != cameraPosition.zoom) {
@@ -44,7 +45,7 @@ public class Clusterer {
 			}
 		}
 	};
-	
+
 	public void clear() {
 		clearMarkers();
 	}
@@ -52,11 +53,11 @@ public class Clusterer {
 	public void forceUpdate() {
 		updateMarkers();
 	}
-	
+
 	public void add(Clusterable marker) {
 		markers.add(marker);
 	}
-	
+
 	public void addAll(List<Clusterable> markers) {
 		this.markers = markers;
 	}
@@ -152,11 +153,17 @@ public class Clusterer {
 					if (onPaintingCluster != null) {
 						Marker marker = map.addMarker(onPaintingCluster.onCreateClusterMarkerOptions(cluster));
 						onPaintingCluster.onMarkerCreated(marker, cluster);
+					} else {
+						map.addMarker(new MarkerOptions().position(cluster.getCenter())
+								.title(Integer.valueOf(cluster.getWeight()).toString())
+								.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 					}
 				} else {
 					if (onPaintingClusterableMarker != null) {
 						Marker marker = map.addMarker(onPaintingClusterableMarker.onCreateMarkerOptions(cluster.getMarkers().get(0)));
 						onPaintingClusterableMarker.onMarkerCreated(marker, cluster.getMarkers().get(0));
+					} else {
+						map.addMarker(new MarkerOptions().position(cluster.getCenter()));
 					}
 				}
 			}
@@ -166,11 +173,13 @@ public class Clusterer {
 
 	public interface OnPaintingClusterableMarkerListener {
 		MarkerOptions onCreateMarkerOptions(Clusterable clusterable);
+
 		void onMarkerCreated(Marker marker, Clusterable clusterable);
 	}
 
 	public interface OnPaintingClusterListener {
 		MarkerOptions onCreateClusterMarkerOptions(Cluster cluster);
+
 		void onMarkerCreated(Marker marker, Cluster cluster);
 	}
 
