@@ -13,7 +13,7 @@ You have all the files you need in the [src/in/nlopez/clustering directory](http
 The objects you want to display in the map **must implement the Clusterable interface**. That interface only needs one method, getPosition() that returns a LatLng object (latitude and longitude).
 
 An example:
-´´´java
+```java
 public class MyPoi implements Clusterable {
 	private String name;
 	private LatLng position;
@@ -28,7 +28,7 @@ public class MyPoi implements Clusterable {
 	@Override
 	public LatLng getPosition() { return position; }
 }
-´´´
+```
 
 TODO
 ----
