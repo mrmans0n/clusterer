@@ -1,10 +1,9 @@
 package com.example.clusteringtest;
 
 import in.nlopez.clustering.Cluster;
-import in.nlopez.clustering.Clusterable;
 import in.nlopez.clustering.Clusterer;
 import in.nlopez.clustering.Clusterer.OnPaintingClusterListener;
-import in.nlopez.clustering.Clusterer.OnPaintingClusterableMarkerListener;
+import in.nlopez.clustering.Clusterer.OnPaintingMarkerListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +33,7 @@ public class MainActivity extends Activity {
 
 	GoogleMap map;
 	List<PointOfInterest> pointsOfInterest;
-	Clusterer clusterer;
+	Clusterer<PointOfInterest> clusterer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,22 +68,18 @@ public class MainActivity extends Activity {
 	}
 	
 	private void initClusterer() {
-		clusterer = new Clusterer(this, map);
-		List<Clusterable> clusterables = new ArrayList<Clusterable>();
-		for (PointOfInterest poi : pointsOfInterest) {
-			clusterables.add(poi);
-		}
-		clusterer.addAll(clusterables);
+		clusterer = new Clusterer<PointOfInterest>(this, map);
+		clusterer.addAll(pointsOfInterest);
 
-		clusterer.setOnPaintingMarkerListener(new OnPaintingClusterableMarkerListener() {
+		clusterer.setOnPaintingMarkerListener(new OnPaintingMarkerListener<PointOfInterest>() {
 
 			@Override
-			public void onMarkerCreated(Marker marker, Clusterable clusterable) {
+			public void onMarkerCreated(Marker marker, PointOfInterest clusterable) {
 
 			}
 
 			@Override
-			public MarkerOptions onCreateMarkerOptions(Clusterable clusterable) {
+			public MarkerOptions onCreateMarkerOptions(PointOfInterest clusterable) {
 				PointOfInterest poi = (PointOfInterest) clusterable;
 				return new MarkerOptions().position(clusterable.getPosition()).title(poi.getName()).snippet(poi.getDescription());
 			}

@@ -14,16 +14,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class Clusterer {
+public class Clusterer<T extends Clusterable> {
 
 	private int GRID_SIZE = 50;
 
 	private GoogleMap googleMap;
 	private Context context;
-	private List<Clusterable> markers = new ArrayList<Clusterable>();
+	private List<T> markers = new ArrayList<T>();
 	private float oldZoomValue = 0f;
 	private OnPaintingClusterListener onPaintingCluster;
-	private OnPaintingClusterableMarkerListener onPaintingMarker;
+	private OnPaintingMarkerListener<T> onPaintingMarker;
 	private OnCameraChangeListener onCameraChangeListener;
 
 	public Clusterer(Context context, GoogleMap googleMap) {
@@ -54,11 +54,11 @@ public class Clusterer {
 		updateMarkers();
 	}
 
-	public void add(Clusterable marker) {
+	public void add(T marker) {
 		markers.add(marker);
 	}
 
-	public void addAll(List<Clusterable> markers) {
+	public void addAll(List<T> markers) {
 		this.markers = markers;
 	}
 
@@ -70,11 +70,11 @@ public class Clusterer {
 		this.onPaintingCluster = onPaintingCluster;
 	}
 
-	public OnPaintingClusterableMarkerListener getOnPaintingMarkerListener() {
+	public OnPaintingMarkerListener<T> getOnPaintingMarkerListener() {
 		return onPaintingMarker;
 	}
 
-	public void setOnPaintingMarkerListener(OnPaintingClusterableMarkerListener onPaintingMarker) {
+	public void setOnPaintingMarkerListener(OnPaintingMarkerListener<T> onPaintingMarker) {
 		this.onPaintingMarker = onPaintingMarker;
 	}
 
@@ -93,23 +93,23 @@ public class Clusterer {
 	}
 
 	protected void clearMarkers() {
-		markers = new ArrayList<Clusterable>();
+		markers = new ArrayList<T>();
 	}
 
-	private class UpdateMarkersTask extends AsyncTask<List<Clusterable>, Void, HashMap<Point, Cluster>> {
+	private class UpdateMarkersTask extends AsyncTask<List<T>, Void, HashMap<Point, Cluster>> {
 
 		private GoogleMap map;
-		private OnPaintingClusterableMarkerListener onPaintingClusterableMarker;
+		private OnPaintingMarkerListener<T> onPaintingMarker;
 		private OnPaintingClusterListener onPaintingCluster;
 		private Projection projection;
 		private int gridInPixels;
 
-		UpdateMarkersTask(Context context, GoogleMap map, OnPaintingClusterableMarkerListener onPaintingClusterableMarker,
-				OnPaintingClusterListener onPaintingCluster) {
+		UpdateMarkersTask(Context context, GoogleMap map, OnPaintingMarkerListener<T> onPaintingMarker,
+		                  OnPaintingClusterListener onPaintingCluster) {
 			this.gridInPixels = (int) (GRID_SIZE * context.getResources().getDisplayMetrics().density + 0.5f);
 			this.map = map;
 			this.onPaintingCluster = onPaintingCluster;
-			this.onPaintingClusterableMarker = onPaintingClusterableMarker;
+			this.onPaintingMarker = onPaintingMarker;
 			this.projection = map.getProjection();
 
 		}
@@ -120,11 +120,12 @@ public class Clusterer {
 		}
 
 		@Override
-		protected HashMap<Point, Cluster> doInBackground(List<Clusterable>... params) {
+		protected HashMap<Point, Cluster> doInBackground(List<T>... params) {
 
 			HashMap<Point, Cluster> clusters = new HashMap<Point, Cluster>();
 
-			for (Clusterable marker : params[0]) {
+			for (T marker : params[0]) {
+
 				Point position = projection.toScreenLocation(marker.getPosition());
 				boolean addedToCluster = false;
 
@@ -145,6 +146,7 @@ public class Clusterer {
 			return clusters;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		protected void onPostExecute(HashMap<Point, Cluster> result) {
 			map.clear();
@@ -159,9 +161,9 @@ public class Clusterer {
 								.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 					}
 				} else {
-					if (onPaintingClusterableMarker != null) {
-						Marker marker = map.addMarker(onPaintingClusterableMarker.onCreateMarkerOptions(cluster.getMarkers().get(0)));
-						onPaintingClusterableMarker.onMarkerCreated(marker, cluster.getMarkers().get(0));
+					if (onPaintingMarker != null) {
+						Marker marker = map.addMarker(onPaintingMarker.onCreateMarkerOptions((T) cluster.getMarkers().get(0)));
+						onPaintingMarker.onMarkerCreated(marker, (T)cluster.getMarkers().get(0));
 					} else {
 						map.addMarker(new MarkerOptions().position(cluster.getCenter()));
 					}
@@ -171,10 +173,10 @@ public class Clusterer {
 
 	}
 
-	public interface OnPaintingClusterableMarkerListener {
-		MarkerOptions onCreateMarkerOptions(Clusterable clusterable);
+	public interface OnPaintingMarkerListener<T extends Clusterable> {
+		MarkerOptions onCreateMarkerOptions(T clusterable);
 
-		void onMarkerCreated(Marker marker, Clusterable clusterable);
+		void onMarkerCreated(Marker marker, T clusterable);
 	}
 
 	public interface OnPaintingClusterListener {
