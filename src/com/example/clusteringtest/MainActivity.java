@@ -6,6 +6,7 @@ import in.nlopez.clustering.Clusterer.OnPaintingClusterListener;
 import in.nlopez.clustering.Clusterer.OnPaintingMarkerListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
@@ -18,10 +19,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.example.clusteringtest.model.PointOfInterest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -34,6 +37,8 @@ public class MainActivity extends Activity {
 	GoogleMap map;
 	List<PointOfInterest> pointsOfInterest;
 	Clusterer<PointOfInterest> clusterer;
+	HashMap<Marker, PointOfInterest> markers = new HashMap<Marker, PointOfInterest>();
+	HashMap<Marker, Cluster> clusters = new HashMap<Marker, Cluster>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +48,7 @@ public class MainActivity extends Activity {
 		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 
 		createDummyLocations();
-		moveMap();
+		initMap();
 		initClusterer();
 	}
 
@@ -62,9 +67,21 @@ public class MainActivity extends Activity {
 				"Greatest munye-munye I've ever tasted"));
 	}
 
-	private void moveMap() {
+	private void initMap() {
 		CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(40.463667,-3.749220)).zoom(1).build();
 		map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+		map.setOnMarkerClickListener(new OnMarkerClickListener() {
+			
+			@Override
+			public boolean onMarkerClick(Marker marker) {
+				if (markers.containsKey(marker)) {
+					Toast.makeText(MainActivity.this, "Poi clicked!", Toast.LENGTH_LONG).show();
+				} else if (clusters.containsKey(marker)){
+					Toast.makeText(MainActivity.this, "Cluster clicked!", Toast.LENGTH_LONG).show();
+				}
+				return false;
+			}
+		});
 	}
 	
 	private void initClusterer() {
@@ -75,7 +92,7 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onMarkerCreated(Marker marker, PointOfInterest clusterable) {
-
+				markers.put(marker, clusterable);
 			}
 
 			@Override
@@ -89,7 +106,7 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onMarkerCreated(Marker marker, Cluster cluster) {
-
+				clusters.put(marker, cluster);
 			}
 
 			@Override
