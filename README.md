@@ -1,5 +1,5 @@
-Clustering for Maps v2 for Android
-==================================
+Clustering in Maps v2 for Android
+=================================
 
 This is a working example that serve as proof of concept of poi clustering in Android Maps v2. 
 
