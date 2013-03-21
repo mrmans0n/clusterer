@@ -9,6 +9,8 @@ public class Cluster {
 
 	private List<Clusterable> markers = new ArrayList<Clusterable>();
 	private LatLng center; 
+	private Double latitudeSum;
+	private Double longitudeSum;
 		
 	public Cluster(Clusterable marker) { 
 		addMarker(marker);
@@ -18,6 +20,12 @@ public class Cluster {
 		markers.add(marker);
 		if (center == null) {
 			center = marker.getPosition();
+			latitudeSum = center.latitude;
+			longitudeSum = center.longitude;
+		} else {
+			latitudeSum += marker.getPosition().latitude;
+			longitudeSum += marker.getPosition().longitude;
+			center = new LatLng(latitudeSum/markers.size(), longitudeSum/markers.size());
 		}
 	}
 
