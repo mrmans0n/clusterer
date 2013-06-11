@@ -104,9 +104,9 @@ You know the drill: fork it and then make a pull request, or just put an issue i
 Contact
 =======
 
-You can follow me on twitter at [@mrmans0n](http://twitter.com/mrmans0n) and email me at nacho@nlopez.in
+You can follow me on twitter at [@mrmans0n](http://twitter.com/mrmans0n) and email me at nacho@nlopez.io
 
-Also, my site has a lot of info you might find useful: http://nlopez.in
+Also, my site has a lot of info you might find useful: http://nlopez.io
 
 License
 =======
