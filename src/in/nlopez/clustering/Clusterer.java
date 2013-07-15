@@ -59,7 +59,7 @@ public class Clusterer<T extends Clusterable> {
 	}
 
 	public void addAll(List<T> markers) {
-		this.markers = markers;
+		this.markers.addAll(markers);
 	}
 
 	public OnPaintingClusterListener getOnPaintingClusterListener() {
