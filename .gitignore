@@ -18,3 +18,25 @@ local.properties
 # Eclipse project files
 .classpath
 .project
+
+# Maven files
+target/
+
+# Android annotations
+aa-gen/
+aa-test/
+
+# IntelliJ IDEA
+.idea/
+*/.idea/
+*.iml
+*/gen-gen-external-apklibs/
+*/gen-external-apklibs/
+library/gen-external-apklibs/
+library/target/
+sample/gen-external-apklibs/
+sample/target/
+out/
+
+# Apple crap
+.DS_Store
