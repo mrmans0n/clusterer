@@ -129,24 +129,24 @@ Here you have an example that displays the value of an attribute called `descrip
 	}
 
     // A little method that creates a composition with an image from the drawables and the number of pois included in a particular cluster
-	private Bitmap getClusteredLabel(Integer count, Context ctx) {
-		Resources r = ctx.getResources();
-		Bitmap res = BitmapFactory.decodeResource(r, R.drawable.circle_red);
-		res = res.copy(Bitmap.Config.ARGB_8888, true);
-		Canvas c = new Canvas(res);
+    private Bitmap getClusteredLabel(Integer count, Context ctx) {
+        Resources r = ctx.getResources();
+        Bitmap res = BitmapFactory.decodeResource(r, R.drawable.circle_red);
+        res = res.copy(Bitmap.Config.ARGB_8888, true);
+        Canvas c = new Canvas(res);
 
-		Paint textPaint = new Paint();
-		textPaint.setAntiAlias(true);
-		textPaint.setTextAlign(Paint.Align.CENTER);
-		textPaint.setTypeface(Typeface.DEFAULT_BOLD);
-		textPaint.setColor(Color.WHITE);
-		textPaint.setTextSize(30);
+        Paint textPaint = new Paint();
+        textPaint.setAntiAlias(true);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+        textPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        textPaint.setColor(Color.WHITE);
+        float density = getResources().getDisplayMetrics().density;
+        textPaint.setTextSize(16 * density);
 
-		c.drawText(String.valueOf(count.toString()), res.getWidth() / 2, res.getHeight() / 2 + textPaint.getTextSize() / 3, textPaint);
+        c.drawText(String.valueOf(count.toString()), res.getWidth() / 2, res.getHeight() / 2 + textPaint.getTextSize() / 3, textPaint);
 
-		return res;
-	}
-
+        return res;
+    }
 ```
 
 As you can see, the listeners for the interfaces `OnPaintingClusterableMarkerListener` and `OnPaintingClusterListener` let you do anything you want to the markers, whether if they are a cluster or a point of interest in their own.

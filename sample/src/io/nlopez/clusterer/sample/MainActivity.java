@@ -121,7 +121,8 @@ public class MainActivity extends Activity {
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setTypeface(Typeface.DEFAULT_BOLD);
         textPaint.setColor(Color.WHITE);
-        textPaint.setTextSize(30);
+        float density = getResources().getDisplayMetrics().density;
+        textPaint.setTextSize(16 * density);
 
         c.drawText(String.valueOf(count.toString()), res.getWidth() / 2, res.getHeight() / 2 + textPaint.getTextSize() / 3, textPaint);
 
