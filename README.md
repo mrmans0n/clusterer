@@ -55,7 +55,7 @@ public class MyPoi implements Clusterable {
 }
 ```
 
-### In your MapFragment or wherever you have a reference to the GoogleMap object
+### Where you have a reference to the GoogleMap object
 
 In the class you are using the GoogleMap object, you must instance the **Clusterer** object.
 
