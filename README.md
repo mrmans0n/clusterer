@@ -84,6 +84,8 @@ Example:
             public void onCameraChange(CameraPosition cameraPosition) {
                 // Do your thing in here
             });
+        }
+    );
 ```
 
 Customization
