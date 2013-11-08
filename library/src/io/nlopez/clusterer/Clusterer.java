@@ -18,13 +18,16 @@ import java.util.List;
 /**
  * Created by Nacho Lopez on 28/10/13.
  */
-public class Clusterer {
+public class Clusterer<T extends Clusterable> {
 
     private static final int GRID_SIZE = 50;
+    private static final int NODE_CAPACITY = 4;
+    private static final QuadTreeBoundingBox WORLD = new QuadTreeBoundingBox(19, -166, 72, -53);
 
     private GoogleMap googleMap;
     private Context context;
-    private List<Clusterable> markers = new ArrayList<Clusterable>();
+    private List<T> pointsOfInterest = new ArrayList<T>();
+    private QuadTree<T> pointsTree;
     private float oldZoomValue = 0f;
     private OnPaintingClusterListener onPaintingCluster;
     private OnPaintingClusterableMarkerListener onPaintingMarker;
@@ -34,6 +37,11 @@ public class Clusterer {
         this.googleMap = googleMap;
         this.context = context;
         this.googleMap.setOnCameraChangeListener(cameraChanged);
+        initQuadTree();
+    }
+
+    private void initQuadTree() {
+        this.pointsTree = new QuadTree<T>(, NODE_CAPACITY);
     }
 
     GoogleMap.OnCameraChangeListener cameraChanged = new GoogleMap.OnCameraChangeListener() {
@@ -50,20 +58,22 @@ public class Clusterer {
         }
     };
 
-    public void clear() {
-        clearMarkers();
-    }
 
     public void forceUpdate() {
         updateMarkers();
     }
 
-    public void add(Clusterable marker) {
-        markers.add(marker);
+    public void add(T marker) {
+        //pointsOfInterest.add(marker);
+        //pointsTree.insertData(new QuadTreeNodeData<T>(T, ))
     }
 
-    public void addAll(List<Clusterable> markers) {
-        this.markers.addAll(markers);
+    public void addAll(ArrayList<T> markers) {
+        QuadTreeNodeData<T> allData = new QuadTreeNodeData<T>(WORLD, NODE_CAPACITY);
+        allData.setData(markers);
+        pointsTree.insertData(allData);
+
+        // this.pointsOfInterest.addAll(markers);
     }
 
     public OnPaintingClusterListener getOnPaintingClusterListener() {
@@ -93,14 +103,10 @@ public class Clusterer {
     @SuppressWarnings("unchecked")
     protected void updateMarkers() {
         UpdateMarkersTask task = new UpdateMarkersTask(context, googleMap, onPaintingMarker, onPaintingCluster);
-        task.execute(markers);
+        task.execute(pointsOfInterest);
     }
 
-    protected void clearMarkers() {
-        markers = new ArrayList<Clusterable>();
-    }
-
-    private class UpdateMarkersTask extends AsyncTask<List<Clusterable>, Void, HashMap<Point, Cluster>> {
+    private class UpdateMarkersTask extends AsyncTask<List<T>, Void, HashMap<Point, Cluster>> {
 
         private GoogleMap map;
         private OnPaintingClusterableMarkerListener onPaintingClusterableMarker;
@@ -124,7 +130,7 @@ public class Clusterer {
         }
 
         @Override
-        protected HashMap<Point, Cluster> doInBackground(List<Clusterable>... params) {
+        protected HashMap<Point, Cluster> doInBackground(List<T>... params) {
 
             HashMap<Point, Cluster> clusters = new HashMap<Point, Cluster>();
 

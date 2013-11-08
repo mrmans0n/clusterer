@@ -86,9 +86,6 @@ public class QuadTreeNode<T extends Clusterable> {
         southEast.processDataInRange(range, listener);
     }
 
-    public voi
-
-
     public QuadTreeNode<T> getNorthWest() {
         return northWest;
     }
