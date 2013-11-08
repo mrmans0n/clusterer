@@ -11,7 +11,7 @@ public class QuadTreeNodeData<T extends Clusterable> {
     private QuadTreeBoundingBox bounds;
 
     public QuadTreeNodeData(QuadTreeBoundingBox bounds, int capacity) {
-        this.data = new ArrayList<>(capacity);
+        this.data = new ArrayList<T>(capacity);
         this.bounds = bounds;
     }
 

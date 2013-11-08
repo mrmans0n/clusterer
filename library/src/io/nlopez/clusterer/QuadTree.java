@@ -1,7 +1,10 @@
 package io.nlopez.clusterer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
- * Created by mrm on 04/11/13.
+ * Created by Nacho L. on 04/11/13.
  */
 public class QuadTree<T extends Clusterable> {
 
@@ -12,41 +15,38 @@ public class QuadTree<T extends Clusterable> {
     }
 
     public void subdivide() {
-
-        QuadTreeBoundingBox box = root.getBoundingBox();
-        double xMid = (box.getXf() + box.getX1()) / 2.0;
-        double yMid = (box.getYf() + box.getY1()) / 2.0;
-
-        int capacity = root.getCapacity();
-
-        QuadTreeBoundingBox northWest = new QuadTreeBoundingBox(box.getX1(), box.getY1(), xMid, yMid);
-        root.setNorthWest(new QuadTreeNode<T>(northWest, capacity));
-
-        QuadTreeBoundingBox northEast = new QuadTreeBoundingBox(xMid, box.getY1(), box.getXf(), yMid);
-        root.setNorthEast(new QuadTreeNode<T>(northEast, capacity));
-
-        QuadTreeBoundingBox southWest = new QuadTreeBoundingBox(box.getX1(), yMid, xMid, box.getYf());
-        root.setSouthWest(new QuadTreeNode<T>(southWest, capacity));
-
-        QuadTreeBoundingBox southEast = new QuadTreeBoundingBox(box.getX1(), box.getY1(), xMid, yMid);
-        root.setSouthEast(new QuadTreeNode<T>(southEast, capacity));
-
+        root.subdivide();
     }
 
     public boolean insertData(QuadTreeNodeData<T> data) {
-        if (!root.getBoundingBox().containsData(data)) {
-            return false;
-        }
-
-        if (root.getCount() < root.getCapacity()) {
-            root.getNodeData().getData().addAll(data.getData());
-            return true;
-        }
-
-        if (root.getNorthWest() == null) {
-            subdivide();
-        }
-
-        // TODO finish
+        return root.insertData(data);
     }
+
+    public void processDataInRange(QuadTreeBoundingBox boundingBox, OnDataInRangeListener<T> listener) {
+        root.processDataInRange(boundingBox, listener);
+    }
+
+    public void traverseNodes(OnNodeVisitedListener<T> listener) {
+        LinkedList<QuadTreeNode<T>> queue = new LinkedList<QuadTreeNode<T>>();
+        queue.add(root);
+        while (queue.size()>0) {
+            QuadTreeNode<T> current = queue.removeFirst();
+            if (listener != null) {
+                listener.onNodeVisited(current);
+            }
+            if (current.getNorthWest()!=null) queue.add(current.getNorthWest());
+            if (current.getNorthEast()!=null) queue.add(current.getNorthEast());
+            if (current.getSouthWest()!=null) queue.add(current.getSouthWest());
+            if (current.getSouthEast()!=null) queue.add(current.getSouthEast());
+        }
+    }
+
+    public interface OnDataInRangeListener<T extends Clusterable> {
+        void onClusterablesInRange(List<T> points);
+    }
+
+    public interface OnNodeVisitedListener<T extends Clusterable> {
+        void onNodeVisited(QuadTreeNode<T> node);
+    }
+
 }
