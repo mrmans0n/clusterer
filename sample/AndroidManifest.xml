@@ -31,7 +31,7 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyB4-ESFbvlppmO-9-h8JO3D-IOhTSDjWmE" />
+            android:value="AIzaSyAE9yEoIBO8rKyPdREfgEhbja4AtJxqPFE" />
 
         <activity
             android:name="io.nlopez.clusterer.sample.MainActivity"
