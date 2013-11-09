@@ -46,9 +46,9 @@ public class QuadTreeBoundingBox {
         this.yf = yf;
     }
 
-    public boolean containsData(QuadTreeNodeData data) {
-        boolean containsX = this.x1 <= data.getBounds().getX1() && this.xf <= data.getBounds().getXf();
-        boolean containsY = this.y1 <= data.getBounds().getY1() && this.yf <= data.getBounds().getYf();
+    public boolean containsData(QuadTreeNode data) {
+        boolean containsX = this.x1 <= data.getBoundingBox().getX1() && this.xf <= data.getBoundingBox().getXf();
+        boolean containsY = this.y1 <= data.getBoundingBox().getY1() && this.yf <= data.getBoundingBox().getYf();
         return containsX && containsY;
     }
 

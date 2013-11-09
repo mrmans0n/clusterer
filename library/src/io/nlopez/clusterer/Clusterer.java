@@ -8,6 +8,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -26,9 +27,10 @@ public class Clusterer<T extends Clusterable> {
 
     private GoogleMap googleMap;
     private Context context;
-    private List<T> pointsOfInterest = new ArrayList<T>();
     private QuadTree<T> pointsTree;
     private float oldZoomValue = 0f;
+    private LatLng oldTargetValue;
+
     private OnPaintingClusterListener onPaintingCluster;
     private OnPaintingClusterableMarkerListener onPaintingMarker;
     private OnCameraChangeListener onCameraChangeListener;
@@ -41,15 +43,17 @@ public class Clusterer<T extends Clusterable> {
     }
 
     private void initQuadTree() {
-        this.pointsTree = new QuadTree<T>(, NODE_CAPACITY);
+        this.pointsTree = new QuadTree<T>(WORLD, NODE_CAPACITY);
     }
 
     GoogleMap.OnCameraChangeListener cameraChanged = new GoogleMap.OnCameraChangeListener() {
 
         @Override
         public void onCameraChange(CameraPosition cameraPosition) {
-            if (oldZoomValue != cameraPosition.zoom) {
+            if (oldZoomValue != cameraPosition.zoom || oldTargetValue != cameraPosition.target) {
                 oldZoomValue = cameraPosition.zoom;
+                oldTargetValue = cameraPosition.target;
+
                 updateMarkers();
             }
             if (onCameraChangeListener != null) {
@@ -64,16 +68,15 @@ public class Clusterer<T extends Clusterable> {
     }
 
     public void add(T marker) {
-        //pointsOfInterest.add(marker);
-        //pointsTree.insertData(new QuadTreeNodeData<T>(T, ))
+        pointsTree.insertData(marker);
     }
 
-    public void addAll(ArrayList<T> markers) {
-        QuadTreeNodeData<T> allData = new QuadTreeNodeData<T>(WORLD, NODE_CAPACITY);
-        allData.setData(markers);
-        pointsTree.insertData(allData);
+    public void addAll(List<T> markers) {
+        pointsTree.insertData(markers);
+    }
 
-        // this.pointsOfInterest.addAll(markers);
+    public void clear() {
+        initQuadTree();
     }
 
     public OnPaintingClusterListener getOnPaintingClusterListener() {
@@ -103,10 +106,10 @@ public class Clusterer<T extends Clusterable> {
     @SuppressWarnings("unchecked")
     protected void updateMarkers() {
         UpdateMarkersTask task = new UpdateMarkersTask(context, googleMap, onPaintingMarker, onPaintingCluster);
-        task.execute(pointsOfInterest);
+        task.execute(pointsTree);
     }
 
-    private class UpdateMarkersTask extends AsyncTask<List<T>, Void, HashMap<Point, Cluster>> {
+    private class UpdateMarkersTask extends AsyncTask<QuadTree<T>, Void, HashMap<Point, Cluster>> {
 
         private GoogleMap map;
         private OnPaintingClusterableMarkerListener onPaintingClusterableMarker;
@@ -130,11 +133,21 @@ public class Clusterer<T extends Clusterable> {
         }
 
         @Override
-        protected HashMap<Point, Cluster> doInBackground(List<T>... params) {
+        protected HashMap<Point, Cluster> doInBackground(QuadTree<T>... params) {
 
             HashMap<Point, Cluster> clusters = new HashMap<Point, Cluster>();
+            QuadTree<T> tree = params[0];
 
-            for (Clusterable marker : params[0]) {
+            // Get x1,y1,xf,yf from bounds
+            double x1 = map.getProjection().getVisibleRegion().latLngBounds.southwest.latitude;
+            double y1 = map.getProjection().getVisibleRegion().latLngBounds.northeast.longitude;
+            double xf = map.getProjection().getVisibleRegion().latLngBounds.northeast.latitude;
+            double yf = map.getProjection().getVisibleRegion().latLngBounds.southwest.longitude;
+            QuadTreeBoundingBox boundingBox = new QuadTreeBoundingBox(x1, y1, xf, yf);
+            ArrayList<T> pointsInRegion = new ArrayList<T>();
+            tree.getPointsInRange(boundingBox, pointsInRegion);
+
+            for (Clusterable marker : pointsInRegion) {
                 Point position = projection.toScreenLocation(marker.getPosition());
                 boolean addedToCluster = false;
 

@@ -1,5 +1,6 @@
 package io.nlopez.clusterer;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,31 +19,33 @@ public class QuadTree<T extends Clusterable> {
         root.subdivide();
     }
 
-    public boolean insertData(QuadTreeNodeData<T> data) {
+    public boolean insertData(T data) {
+        ArrayList<T> oneElementArray = new ArrayList<T>();
+        oneElementArray.add(data);
+        return insertData(oneElementArray);
+    }
+
+    public boolean insertData(List<T> data) {
         return root.insertData(data);
     }
 
-    public void processDataInRange(QuadTreeBoundingBox boundingBox, OnDataInRangeListener<T> listener) {
-        root.processDataInRange(boundingBox, listener);
+    public void getPointsInRange(QuadTreeBoundingBox boundingBox, ArrayList<T> points) {
+        root.processDataInRange(boundingBox, points);
     }
 
     public void traverseNodes(OnNodeVisitedListener<T> listener) {
         LinkedList<QuadTreeNode<T>> queue = new LinkedList<QuadTreeNode<T>>();
         queue.add(root);
-        while (queue.size()>0) {
+        while (queue.size() > 0) {
             QuadTreeNode<T> current = queue.removeFirst();
             if (listener != null) {
                 listener.onNodeVisited(current);
             }
-            if (current.getNorthWest()!=null) queue.add(current.getNorthWest());
-            if (current.getNorthEast()!=null) queue.add(current.getNorthEast());
-            if (current.getSouthWest()!=null) queue.add(current.getSouthWest());
-            if (current.getSouthEast()!=null) queue.add(current.getSouthEast());
+            if (current.getNorthWest() != null) queue.add(current.getNorthWest());
+            if (current.getNorthEast() != null) queue.add(current.getNorthEast());
+            if (current.getSouthWest() != null) queue.add(current.getSouthWest());
+            if (current.getSouthEast() != null) queue.add(current.getSouthEast());
         }
-    }
-
-    public interface OnDataInRangeListener<T extends Clusterable> {
-        void onClusterablesInRange(List<T> points);
     }
 
     public interface OnNodeVisitedListener<T extends Clusterable> {
