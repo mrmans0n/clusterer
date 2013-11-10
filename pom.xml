@@ -4,7 +4,7 @@
 	<groupId>io.nlopez.clusterer</groupId>
 	<artifactId>parent</artifactId>
 	<packaging>pom</packaging>
-	<version>${clusterer.version}</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>Clusterer</name>
 	<description>Android library project that intends to easily create POI Clusters for Maps v2
     </description>

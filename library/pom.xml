@@ -5,18 +5,17 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.nlopez.clusterer</groupId>
-    <artifactId>library</artifactId>
-    <version>${clusterer.version}</version>
-    <name>Clusterer Library</name>
-    <packaging>apklib</packaging>
-
     <parent>
         <groupId>io.nlopez.clusterer</groupId>
         <artifactId>parent</artifactId>
-        <version>${clusterer.version}</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+
+    <artifactId>library</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
+    <name>Clusterer Library</name>
+    <packaging>apklib</packaging>
 
     <dependencies>
         <dependency>
