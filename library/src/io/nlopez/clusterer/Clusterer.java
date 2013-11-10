@@ -159,6 +159,7 @@ public class Clusterer<T extends Clusterable> {
             QuadTree<T> tree = params[0];
 
             // Get x1,y1,xf,yf from bounds
+
             double x1 = bounds.southwest.latitude;
             double y1 = bounds.northeast.longitude;
             double xf = bounds.northeast.latitude;

@@ -42,7 +42,7 @@ public class QuadTreeNode<T extends Clusterable> {
 
     public boolean insertData(T data) {
 
-        if (!getBoundingBox().containsData(this)) {
+        if (!getBoundingBox().containsData(data)) {
             return false;
         }
 
@@ -68,10 +68,13 @@ public class QuadTreeNode<T extends Clusterable> {
             return;
         }
 
-        if (boundingBox.containsData(this)) {
-            if (points != null) {
-                points.addAll(nodeData);
+        for (T element: nodeData) {
+            if (boundingBox.containsData(element)) {
+                if (points != null) {
+                    points.add(element);
+                }
             }
+
         }
 
         if (northWest == null) {
@@ -122,18 +125,6 @@ public class QuadTreeNode<T extends Clusterable> {
 
     public QuadTreeBoundingBox getBoundingBox() {
         return boundingBox;
-    }
-
-    public void setBoundingBox(QuadTreeBoundingBox boundingBox) {
-        this.boundingBox = boundingBox;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
     }
 
 }
