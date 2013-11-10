@@ -121,13 +121,30 @@ public class Clusterer<T extends Clusterable> {
 
         UpdateMarkersTask(Context context, GoogleMap map, OnPaintingClusterableMarkerListener onPaintingClusterableMarker,
                           OnPaintingClusterListener onPaintingCluster) {
-            this.gridInPixels = (int) (GRID_SIZE * context.getResources().getDisplayMetrics().density + 0.5f);
             this.map = map;
             this.bounds = map.getProjection().getVisibleRegion().latLngBounds;
+            this.gridInPixels = (int) (getSizeForZoomScale((int)map.getCameraPosition().zoom) * context.getResources().getDisplayMetrics().density + 0.5f);
             this.onPaintingCluster = onPaintingCluster;
             this.onPaintingClusterableMarker = onPaintingClusterableMarker;
             this.projection = map.getProjection();
 
+        }
+
+        private int getSizeForZoomScale(int scale) {
+            switch (scale) {
+                case 13:
+                case 14:
+                case 15:
+                    return 64;
+                case 16:
+                case 17:
+                case 18:
+                    return 32;
+                case 19:
+                    return 16;
+                default:
+                    return 88;
+            }
         }
 
         private boolean isInDistance(Point origin, Point other) {

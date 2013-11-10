@@ -68,11 +68,9 @@ public class QuadTreeNode<T extends Clusterable> {
             return;
         }
 
-        for (int i = 0; i < getCount(); i++) {
-            if (boundingBox.containsData(this)) {
-                if (points != null) {
-                    points.addAll(nodeData);
-                }
+        if (boundingBox.containsData(this)) {
+            if (points != null) {
+                points.addAll(nodeData);
             }
         }
 
