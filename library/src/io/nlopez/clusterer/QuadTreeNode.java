@@ -67,14 +67,12 @@ public class QuadTreeNode<T extends Clusterable> {
         if (!boundingBox.isIntersecting(range)) {
             return;
         }
-
-        for (T element: nodeData) {
-            if (boundingBox.containsData(element)) {
-                if (points != null) {
+        if (points != null) {
+            for (T element : nodeData) {
+                if (boundingBox.containsData(element)) {
                     points.add(element);
                 }
             }
-
         }
 
         if (northWest == null) {

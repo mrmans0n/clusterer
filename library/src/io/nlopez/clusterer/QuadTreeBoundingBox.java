@@ -31,13 +31,16 @@ public class QuadTreeBoundingBox {
     }
 
     public boolean containsData(Clusterable data) {
-        boolean containsX = this.x1 <= data.getPosition().latitude && this.xf >= data.getPosition().latitude;
-        boolean containsY = this.y1 <= data.getPosition().longitude && this.yf >= data.getPosition().longitude;
-        return containsX && containsY;
+        return containsPoint(data.getPosition().latitude, data.getPosition().longitude);
     }
 
     public boolean isIntersecting(QuadTreeBoundingBox other) {
-        return (this.x1 <= other.getXf() && this.xf >= other.getX1() &&
-                this.y1 <= other.getYf() && this.yf >= other.getY1());
+        return containsPoint(other.getX1(), other.getY1()) || containsPoint(other.getXf(), other.getYf());
+    }
+
+    private boolean containsPoint(double x, double y) {
+        boolean containsX = this.x1 <= x && this.xf >= x;
+        boolean containsY = this.y1 <= y && this.yf >= y;
+        return containsX && containsY;
     }
 }

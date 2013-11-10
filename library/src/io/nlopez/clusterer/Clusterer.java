@@ -22,7 +22,6 @@ import java.util.List;
  */
 public class Clusterer<T extends Clusterable> {
 
-    private static final int GRID_SIZE = 50;
     private static final int NODE_CAPACITY = 4;
     private static final QuadTreeBoundingBox WORLD = new QuadTreeBoundingBox(-85, -180, 85, 180);
 
@@ -123,7 +122,7 @@ public class Clusterer<T extends Clusterable> {
                           OnPaintingClusterListener onPaintingCluster) {
             this.map = map;
             this.bounds = map.getProjection().getVisibleRegion().latLngBounds;
-            this.gridInPixels = (int) (getSizeForZoomScale((int)map.getCameraPosition().zoom) * context.getResources().getDisplayMetrics().density + 0.5f);
+            this.gridInPixels = (int) (getSizeForZoomScale((int) map.getCameraPosition().zoom) * context.getResources().getDisplayMetrics().density + 0.5f);
             this.onPaintingCluster = onPaintingCluster;
             this.onPaintingClusterableMarker = onPaintingClusterableMarker;
             this.projection = map.getProjection();
