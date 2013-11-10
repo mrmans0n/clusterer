@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by Nacho Lopez on 28/10/13.
  */
-public class Cluster {
+public class Cluster implements Clusterable {
 
     private List<Clusterable> markers = new ArrayList<Clusterable>();
     private LatLng center;
@@ -28,7 +28,7 @@ public class Cluster {
         } else {
             latitudeSum += marker.getPosition().latitude;
             longitudeSum += marker.getPosition().longitude;
-            center = new LatLng(latitudeSum/markers.size(), longitudeSum/markers.size());
+            center = new LatLng(latitudeSum / markers.size(), longitudeSum / markers.size());
         }
     }
 
@@ -48,4 +48,8 @@ public class Cluster {
         return markers.size();
     }
 
+    @Override
+    public LatLng getPosition() {
+        return getCenter();
+    }
 }

@@ -34,11 +34,18 @@ public class Clusterer<T extends Clusterable> {
     private OnPaintingClusterListener onPaintingCluster;
     private OnPaintingClusterableMarkerListener onPaintingMarker;
     private OnCameraChangeListener onCameraChangeListener;
+    private List<T> pointsShown;
+    private List<T> pointsToDelete;
+    private HashMap<Clusterable, Marker> pointMarkers;
+    private List<Marker> clusterMarkers;
 
     public Clusterer(Context context, GoogleMap googleMap) {
         this.googleMap = googleMap;
         this.context = context;
         this.googleMap.setOnCameraChangeListener(cameraChanged);
+        this.pointsShown = new ArrayList<T>();
+        this.pointMarkers = new HashMap<Clusterable, Marker>();
+        this.clusterMarkers = new ArrayList<Marker>();
         initQuadTree();
     }
 
@@ -126,7 +133,6 @@ public class Clusterer<T extends Clusterable> {
             this.onPaintingCluster = onPaintingCluster;
             this.onPaintingClusterableMarker = onPaintingClusterableMarker;
             this.projection = map.getProjection();
-
         }
 
         private int getSizeForZoomScale(int scale) {
@@ -157,8 +163,11 @@ public class Clusterer<T extends Clusterable> {
             HashMap<Point, Cluster> clusters = new HashMap<Point, Cluster>();
             QuadTree<T> tree = params[0];
 
-            // Get x1,y1,xf,yf from bounds
+            // Store old points
+            List<T> pointsToKeep = new ArrayList<T>(pointsShown);
+            pointsToDelete = new ArrayList<T>(pointsShown);
 
+            // Get x1,y1,xf,yf from bounds
             double x1 = bounds.southwest.latitude;
             double y1 = bounds.northeast.longitude;
             double xf = bounds.northeast.latitude;
@@ -167,21 +176,34 @@ public class Clusterer<T extends Clusterable> {
             ArrayList<T> pointsInRegion = new ArrayList<T>();
             tree.getPointsInRange(boundingBox, pointsInRegion);
 
-            for (Clusterable marker : pointsInRegion) {
-                Point position = projection.toScreenLocation(marker.getPosition());
+            // We got here the points we want to show show
+            pointsShown = pointsInRegion;
+
+            // Intersect the new points with the old points = get the points NOT TO delete
+            pointsToKeep.retainAll(pointsShown);
+
+            // Remove from the old points the ones we don't want to delete = in here we will have everything not showing
+            pointsToDelete.removeAll(pointsToKeep);
+
+            for (Clusterable point : pointsInRegion) {
+                Point position = projection.toScreenLocation(point.getPosition());
                 boolean addedToCluster = false;
 
                 for (Point storedPoint : clusters.keySet()) {
 
                     if (isInDistance(position, storedPoint)) {
-                        clusters.get(storedPoint).addMarker(marker);
+                        if (pointsToKeep.contains(point)) {
+                            pointsToKeep.remove(point);
+                            pointsToDelete.add((T)point);
+                        }
+                        clusters.get(storedPoint).addMarker(point);
                         addedToCluster = true;
                         break;
                     }
                 }
 
                 if (!addedToCluster) {
-                    clusters.put(position, new Cluster(marker));
+                    clusters.put(position, new Cluster(point));
                 }
 
             }
@@ -190,24 +212,28 @@ public class Clusterer<T extends Clusterable> {
 
         @Override
         protected void onPostExecute(HashMap<Point, Cluster> result) {
+            // TODO: avoid the map.clear() call and delete knowingly
             map.clear();
             for (Cluster cluster : result.values()) {
+                Marker marker;
                 if (cluster.isCluster()) {
                     if (onPaintingCluster != null) {
-                        Marker marker = map.addMarker(onPaintingCluster.onCreateClusterMarkerOptions(cluster));
+                        marker = map.addMarker(onPaintingCluster.onCreateClusterMarkerOptions(cluster));
                         onPaintingCluster.onMarkerCreated(marker, cluster);
                     } else {
-                        map.addMarker(new MarkerOptions().position(cluster.getCenter())
+                        marker = map.addMarker(new MarkerOptions().position(cluster.getCenter())
                                 .title(Integer.valueOf(cluster.getWeight()).toString())
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                     }
+                    // clusterMarkers.add(marker);
                 } else {
                     if (onPaintingClusterableMarker != null) {
-                        Marker marker = map.addMarker(onPaintingClusterableMarker.onCreateMarkerOptions(cluster.getMarkers().get(0)));
+                        marker = map.addMarker(onPaintingClusterableMarker.onCreateMarkerOptions(cluster.getMarkers().get(0)));
                         onPaintingClusterableMarker.onMarkerCreated(marker, cluster.getMarkers().get(0));
                     } else {
-                        map.addMarker(new MarkerOptions().position(cluster.getCenter()));
+                        marker = map.addMarker(new MarkerOptions().position(cluster.getCenter()));
                     }
+                    // pointMarkers.put(cluster, marker);
                 }
             }
         }
