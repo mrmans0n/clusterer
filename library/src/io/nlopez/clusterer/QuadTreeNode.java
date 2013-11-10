@@ -1,7 +1,6 @@
 package io.nlopez.clusterer;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Nacho L. on 04/11/13.
@@ -41,14 +40,14 @@ public class QuadTreeNode<T extends Clusterable> {
 
     }
 
-    public boolean insertData(List<T> data) {
+    public boolean insertData(T data) {
 
         if (!getBoundingBox().containsData(this)) {
             return false;
         }
 
         if (getCount() < capacity) {
-            nodeData.addAll(data);
+            nodeData.add(data);
             return true;
         }
 

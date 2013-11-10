@@ -20,13 +20,13 @@ public class QuadTree<T extends Clusterable> {
     }
 
     public boolean insertData(T data) {
-        ArrayList<T> oneElementArray = new ArrayList<T>();
-        oneElementArray.add(data);
-        return insertData(oneElementArray);
+        return insertData(data);
     }
 
-    public boolean insertData(List<T> data) {
-        return root.insertData(data);
+    public void insertData(List<T> data) {
+        for (T t : data) {
+            root.insertData(t);
+        }
     }
 
     public void getPointsInRange(QuadTreeBoundingBox boundingBox, ArrayList<T> points) {

@@ -62,6 +62,30 @@ public class MainActivity extends Activity {
                 "Best envelopes"));
         pointsOfInterest.add(new PointOfInterest(new LatLng(39.4699075, -0.3762881000000107), "Cottolengo",
                 "Greatest munye-munye I've ever tasted"));
+
+        pointsOfInterest.add(new PointOfInterest(new LatLng(38.4094747, -7.24561540000002), "Perry's house", "Very beautiful"));
+        pointsOfInterest.add(new PointOfInterest(new LatLng(38.4701005, -0.3769916999999623), "SCUMM bar",
+                "It's just testimonial"));
+        pointsOfInterest.add(new PointOfInterest(new LatLng(38.6340369, -0.13612690000002203), "The fifth pine",
+                "Cluttered and always crowded"));
+        pointsOfInterest.add(new PointOfInterest(new LatLng(38.4753029, -0.37543890000006286), "Bernarda's junk",
+                "Very beautiful, various styles"));
+        pointsOfInterest.add(new PointOfInterest(new LatLng(38.48158069999999, -0.3436993000000257), "Bar Cenas",
+                "Best envelopes"));
+        pointsOfInterest.add(new PointOfInterest(new LatLng(38.4699075, -0.3762881000000107), "Cottolengo",
+                "Greatest munye-munye I've ever tasted"));
+
+        pointsOfInterest.add(new PointOfInterest(new LatLng(37.4094747, -7.24561540000002), "Perry's house", "Very beautiful"));
+        pointsOfInterest.add(new PointOfInterest(new LatLng(37.4701005, -0.3769916999999623), "SCUMM bar",
+                "It's just testimonial"));
+        pointsOfInterest.add(new PointOfInterest(new LatLng(37.6340369, -0.13612690000002203), "The fifth pine",
+                "Cluttered and always crowded"));
+        pointsOfInterest.add(new PointOfInterest(new LatLng(37.4753029, -0.37543890000006286), "Bernarda's junk",
+                "Very beautiful, various styles"));
+        pointsOfInterest.add(new PointOfInterest(new LatLng(37.48158069999999, -0.3436993000000257), "Bar Cenas",
+                "Best envelopes"));
+        pointsOfInterest.add(new PointOfInterest(new LatLng(37.4699075, -0.3762881000000107), "Cottolengo",
+                "Greatest munye-munye I've ever tasted"));
     }
 
     private void moveMap() {

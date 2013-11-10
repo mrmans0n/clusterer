@@ -24,7 +24,7 @@ public class Clusterer<T extends Clusterable> {
 
     private static final int GRID_SIZE = 50;
     private static final int NODE_CAPACITY = 4;
-    private static final QuadTreeBoundingBox WORLD = new QuadTreeBoundingBox(19, -166, 72, -53);
+    private static final QuadTreeBoundingBox WORLD = new QuadTreeBoundingBox(-85, -180, 85, 180);
 
     private GoogleMap googleMap;
     private Context context;
