@@ -35,7 +35,7 @@ public class QuadTreeNode<T extends Clusterable> {
         QuadTreeBoundingBox southWest = new QuadTreeBoundingBox(box.getX1(), yMid, xMid, box.getYf());
         setSouthWest(new QuadTreeNode<T>(southWest, capacity));
 
-        QuadTreeBoundingBox southEast = new QuadTreeBoundingBox(box.getX1(), box.getY1(), xMid, yMid);
+        QuadTreeBoundingBox southEast = new QuadTreeBoundingBox(xMid, yMid, box.getXf(), box.getYf());
         setSouthEast(new QuadTreeNode<T>(southEast, capacity));
 
     }

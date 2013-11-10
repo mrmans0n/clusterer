@@ -62,6 +62,10 @@ public class MainActivity extends Activity {
                 "Best envelopes"));
         pointsOfInterest.add(new PointOfInterest(new LatLng(39.4699075, -0.3762881000000107), "Cottolengo",
                 "Greatest munye-munye I've ever tasted"));
+        pointsOfInterest.add(new PointOfInterest(new LatLng(39.5699075, -0.3762881000000107), "Perry Meison",
+                "A test point"));
+        pointsOfInterest.add(new PointOfInterest(new LatLng(39.4699075, -0.5762881000000107), "Meison Burgz",
+                "Boooooring!"));
     }
 
     private void moveMap() {
