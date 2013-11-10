@@ -1,4 +1,4 @@
-package io.nlopez.clusterer.sample;
+package io.nlopez.clusterer.sample.application;
 
 import android.app.Activity;
 import android.content.Context;

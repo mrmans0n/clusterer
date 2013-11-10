@@ -9,6 +9,7 @@ import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -112,6 +113,7 @@ public class Clusterer<T extends Clusterable> {
     private class UpdateMarkersTask extends AsyncTask<QuadTree<T>, Void, HashMap<Point, Cluster>> {
 
         private GoogleMap map;
+        private LatLngBounds bounds;
         private OnPaintingClusterableMarkerListener onPaintingClusterableMarker;
         private OnPaintingClusterListener onPaintingCluster;
         private Projection projection;
@@ -121,6 +123,7 @@ public class Clusterer<T extends Clusterable> {
                           OnPaintingClusterListener onPaintingCluster) {
             this.gridInPixels = (int) (GRID_SIZE * context.getResources().getDisplayMetrics().density + 0.5f);
             this.map = map;
+            this.bounds = map.getProjection().getVisibleRegion().latLngBounds;
             this.onPaintingCluster = onPaintingCluster;
             this.onPaintingClusterableMarker = onPaintingClusterableMarker;
             this.projection = map.getProjection();
@@ -139,10 +142,10 @@ public class Clusterer<T extends Clusterable> {
             QuadTree<T> tree = params[0];
 
             // Get x1,y1,xf,yf from bounds
-            double x1 = map.getProjection().getVisibleRegion().latLngBounds.southwest.latitude;
-            double y1 = map.getProjection().getVisibleRegion().latLngBounds.northeast.longitude;
-            double xf = map.getProjection().getVisibleRegion().latLngBounds.northeast.latitude;
-            double yf = map.getProjection().getVisibleRegion().latLngBounds.southwest.longitude;
+            double x1 = bounds.southwest.latitude;
+            double y1 = bounds.northeast.longitude;
+            double xf = bounds.northeast.latitude;
+            double yf = bounds.southwest.longitude;
             QuadTreeBoundingBox boundingBox = new QuadTreeBoundingBox(x1, y1, xf, yf);
             ArrayList<T> pointsInRegion = new ArrayList<T>();
             tree.getPointsInRange(boundingBox, pointsInRegion);
