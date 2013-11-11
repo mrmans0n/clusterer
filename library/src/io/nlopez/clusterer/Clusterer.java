@@ -263,7 +263,7 @@ public class Clusterer<T extends Clusterable> {
             }
 
             for (T poi : pointMarkers.keySet()) {
-                if (!result.poisToKeep.contains(poi)) {
+                if (!result.pois.contains(poi)) {
                     Marker marker = pointMarkers.get(poi);
                     if (marker != null) {
                         marker.remove();
