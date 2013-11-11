@@ -8,18 +8,18 @@ import java.util.List;
 /**
  * Created by Nacho Lopez on 28/10/13.
  */
-public class Cluster implements Clusterable {
+public class Cluster<T extends Clusterable> implements Clusterable {
 
-    private List<Clusterable> markers = new ArrayList<Clusterable>();
+    private List<T> markers = new ArrayList<T>();
     private LatLng center;
     private Double latitudeSum;
     private Double longitudeSum;
 
-    public Cluster(Clusterable marker) {
+    public Cluster(T marker) {
         addMarker(marker);
     }
 
-    public void addMarker(Clusterable marker) {
+    public void addMarker(T marker) {
         markers.add(marker);
         if (center == null) {
             center = marker.getPosition();
@@ -32,7 +32,7 @@ public class Cluster implements Clusterable {
         }
     }
 
-    public List<Clusterable> getMarkers() {
+    public List<T> getMarkers() {
         return markers;
     }
 

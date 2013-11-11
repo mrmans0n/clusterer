@@ -47,5 +47,4 @@ public class PointOfInterest implements Clusterable {
     public LatLng getPosition() {
         return getLocationLatLng();
     }
-
 }

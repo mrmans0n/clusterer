@@ -34,17 +34,14 @@ public class Clusterer<T extends Clusterable> {
     private OnPaintingClusterListener onPaintingCluster;
     private OnPaintingClusterableMarkerListener onPaintingMarker;
     private OnCameraChangeListener onCameraChangeListener;
-    private List<T> pointsShown;
-    private List<T> pointsToDelete;
-    private HashMap<Clusterable, Marker> pointMarkers;
+    private HashMap<T, Marker> pointMarkers;
     private List<Marker> clusterMarkers;
 
     public Clusterer(Context context, GoogleMap googleMap) {
         this.googleMap = googleMap;
         this.context = context;
         this.googleMap.setOnCameraChangeListener(cameraChanged);
-        this.pointsShown = new ArrayList<T>();
-        this.pointMarkers = new HashMap<Clusterable, Marker>();
+        this.pointMarkers = new HashMap<T, Marker>();
         this.clusterMarkers = new ArrayList<Marker>();
         initQuadTree();
     }
@@ -116,7 +113,7 @@ public class Clusterer<T extends Clusterable> {
         task.execute(pointsTree);
     }
 
-    private class UpdateMarkersTask extends AsyncTask<QuadTree<T>, Void, HashMap<Point, Cluster>> {
+    private class UpdateMarkersTask extends AsyncTask<QuadTree<T>, Void, ClusteringProcessResultHolder<T>> {
 
         private GoogleMap map;
         private LatLngBounds bounds;
@@ -158,14 +155,14 @@ public class Clusterer<T extends Clusterable> {
         }
 
         @Override
-        protected HashMap<Point, Cluster> doInBackground(QuadTree<T>... params) {
+        protected ClusteringProcessResultHolder doInBackground(QuadTree<T>... params) {
 
-            HashMap<Point, Cluster> clusters = new HashMap<Point, Cluster>();
+            ClusteringProcessResultHolder<T> result = new ClusteringProcessResultHolder<T>();
             QuadTree<T> tree = params[0];
 
             // Store old points
-            List<T> pointsToKeep = new ArrayList<T>(pointsShown);
-            pointsToDelete = new ArrayList<T>(pointsShown);
+            List<T> pointsToKeep = new ArrayList<T>(pointMarkers.keySet());
+            List<T> pointsToDelete = new ArrayList<T>(pointMarkers.keySet());
 
             // Get x1,y1,xf,yf from bounds
             double x1 = bounds.southwest.latitude;
@@ -177,67 +174,96 @@ public class Clusterer<T extends Clusterable> {
             tree.getPointsInRange(boundingBox, pointsInRegion);
 
             // We got here the points we want to show show
-            pointsShown = pointsInRegion;
+            result.pois.addAll(pointsInRegion);
 
             // Intersect the new points with the old points = get the points NOT TO delete
-            pointsToKeep.retainAll(pointsShown);
+            pointsToKeep.retainAll(pointsInRegion);
 
             // Remove from the old points the ones we don't want to delete = in here we will have everything not showing
             pointsToDelete.removeAll(pointsToKeep);
 
-            for (Clusterable point : pointsInRegion) {
+            // Create all the Clusters
+            HashMap<Point, Cluster<T>> positions = new HashMap<Point, Cluster<T>>();
+            for (T point : pointsInRegion) {
                 Point position = projection.toScreenLocation(point.getPosition());
                 boolean addedToCluster = false;
 
-                for (Point storedPoint : clusters.keySet()) {
+                for (Point storedPoint : positions.keySet()) {
 
                     if (isInDistance(position, storedPoint)) {
-                        if (pointsToKeep.contains(point)) {
-                            pointsToKeep.remove(point);
-                            pointsToDelete.add((T)point);
-                        }
-                        clusters.get(storedPoint).addMarker(point);
+                        positions.get(storedPoint).addMarker(point);
                         addedToCluster = true;
                         break;
                     }
                 }
 
                 if (!addedToCluster) {
-                    clusters.put(position, new Cluster(point));
+                    positions.put(position, new Cluster(point));
                 }
 
             }
-            return clusters;
+
+            // Prepare the result: the pois to delete and the new clusters
+            result.poisToDelete.addAll(pointsToDelete);
+            for (Cluster<T> cluster : positions.values()) {
+                if (cluster.isCluster()) {
+                    result.clusters.add(cluster);
+                    for (T poi : cluster.getMarkers()) {
+                        result.pois.remove(poi);
+                    }
+                }
+            }
+            return result;
         }
 
         @Override
-        protected void onPostExecute(HashMap<Point, Cluster> result) {
-            // TODO: avoid the map.clear() call and delete knowingly
-            map.clear();
-            for (Cluster cluster : result.values()) {
+        protected void onPostExecute(ClusteringProcessResultHolder<T> result) {
+            for (Marker marker : clusterMarkers) {
+                marker.remove();
+            }
+
+            for (T poi : result.poisToDelete) {
+                Marker marker = pointMarkers.get(poi);
+                if (marker != null) {
+                    marker.remove();
+                }
+            }
+
+            clusterMarkers.clear();
+            pointMarkers.clear();
+
+            for (Cluster cluster : result.clusters) {
                 Marker marker;
-                if (cluster.isCluster()) {
-                    if (onPaintingCluster != null) {
-                        marker = map.addMarker(onPaintingCluster.onCreateClusterMarkerOptions(cluster));
-                        onPaintingCluster.onMarkerCreated(marker, cluster);
-                    } else {
-                        marker = map.addMarker(new MarkerOptions().position(cluster.getCenter())
-                                .title(Integer.valueOf(cluster.getWeight()).toString())
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-                    }
-                    // clusterMarkers.add(marker);
+                if (onPaintingCluster != null) {
+                    marker = map.addMarker(onPaintingCluster.onCreateClusterMarkerOptions(cluster));
+                    onPaintingCluster.onMarkerCreated(marker, cluster);
                 } else {
+                    marker = map.addMarker(new MarkerOptions().position(cluster.getCenter())
+                            .title(Integer.valueOf(cluster.getWeight()).toString())
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                }
+                clusterMarkers.add(marker);
+            }
+
+            for (T poi : result.pois) {
+                if (!pointMarkers.containsKey(poi)) {
+                    Marker marker;
                     if (onPaintingClusterableMarker != null) {
-                        marker = map.addMarker(onPaintingClusterableMarker.onCreateMarkerOptions(cluster.getMarkers().get(0)));
-                        onPaintingClusterableMarker.onMarkerCreated(marker, cluster.getMarkers().get(0));
+                        marker = map.addMarker(onPaintingClusterableMarker.onCreateMarkerOptions(poi));
+                        onPaintingClusterableMarker.onMarkerCreated(marker, poi);
                     } else {
-                        marker = map.addMarker(new MarkerOptions().position(cluster.getCenter()));
+                        marker = map.addMarker(new MarkerOptions().position(poi.getPosition()));
                     }
-                    // pointMarkers.put(cluster, marker);
+                    pointMarkers.put(poi, marker);
                 }
             }
         }
+    }
 
+    private class ClusteringProcessResultHolder<T> {
+        public ArrayList<Cluster> clusters = new ArrayList<Cluster>();
+        public ArrayList<T> pois = new ArrayList<T>();
+        public ArrayList<T> poisToDelete = new ArrayList<T>();
     }
 
     public interface OnPaintingClusterableMarkerListener {
