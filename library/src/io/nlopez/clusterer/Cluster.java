@@ -1,6 +1,7 @@
 package io.nlopez.clusterer;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,8 @@ import java.util.List;
  * Created by Nacho Lopez on 28/10/13.
  */
 public class Cluster<T extends Clusterable> implements Clusterable {
+
+    private static final double BOUNDS_OFFSET = 0.1;
 
     private List<T> markers = new ArrayList<T>();
     private LatLng center;
@@ -34,6 +37,14 @@ public class Cluster<T extends Clusterable> implements Clusterable {
 
     public List<T> getMarkers() {
         return markers;
+    }
+
+    public LatLngBounds getBounds() {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (T marker : markers) {
+            builder.include(marker.getPosition());
+        }
+        return builder.build();
     }
 
     public LatLng getCenter() {

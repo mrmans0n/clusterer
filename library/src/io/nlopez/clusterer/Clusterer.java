@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.os.AsyncTask;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -23,6 +24,7 @@ import java.util.List;
 public class Clusterer<T extends Clusterable> {
 
     private static final int NODE_CAPACITY = 4;
+    private static final int CLUSTER_CENTER_PADDING = 80;
     private static final QuadTreeBoundingBox WORLD = new QuadTreeBoundingBox(-85, -180, 85, 180);
 
     private GoogleMap googleMap;
@@ -35,14 +37,15 @@ public class Clusterer<T extends Clusterable> {
     private OnPaintingClusterableMarkerListener onPaintingMarker;
     private OnCameraChangeListener onCameraChangeListener;
     private HashMap<T, Marker> pointMarkers;
-    private List<Marker> clusterMarkers;
+    private HashMap<Marker, Cluster<T>> clusterMarkers;
 
     public Clusterer(Context context, GoogleMap googleMap) {
         this.googleMap = googleMap;
         this.context = context;
         this.googleMap.setOnCameraChangeListener(cameraChanged);
+        this.googleMap.setOnMarkerClickListener(markerClicked);
         this.pointMarkers = new HashMap<T, Marker>();
-        this.clusterMarkers = new ArrayList<Marker>();
+        this.clusterMarkers = new HashMap<Marker, Cluster<T>>();
         initQuadTree();
     }
 
@@ -66,6 +69,17 @@ public class Clusterer<T extends Clusterable> {
         }
     };
 
+    GoogleMap.OnMarkerClickListener markerClicked = new GoogleMap.OnMarkerClickListener() {
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            Cluster<T> cluster = clusterMarkers.get(marker);
+            if (cluster != null) {
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(cluster.getBounds(), CLUSTER_CENTER_PADDING));
+                return true;
+            }
+            return false;
+        }
+    };
 
     public void forceUpdate() {
         updateMarkers();
@@ -198,7 +212,7 @@ public class Clusterer<T extends Clusterable> {
                 }
 
                 if (!addedToCluster) {
-                    positions.put(position, new Cluster(point));
+                    positions.put(position, new Cluster<T>(point));
                 }
 
             }
@@ -218,7 +232,7 @@ public class Clusterer<T extends Clusterable> {
 
         @Override
         protected void onPostExecute(ClusteringProcessResultHolder<T> result) {
-            for (Marker marker : clusterMarkers) {
+            for (Marker marker : clusterMarkers.keySet()) {
                 marker.remove();
             }
 
@@ -242,7 +256,7 @@ public class Clusterer<T extends Clusterable> {
                             .title(Integer.valueOf(cluster.getWeight()).toString())
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 }
-                clusterMarkers.add(marker);
+                clusterMarkers.put(marker, cluster);
             }
 
             for (T poi : result.pois) {
