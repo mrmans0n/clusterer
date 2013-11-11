@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.os.AsyncTask;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
@@ -24,7 +25,7 @@ import java.util.List;
 public class Clusterer<T extends Clusterable> {
 
     private static final int NODE_CAPACITY = 4;
-    private static final int CLUSTER_CENTER_PADDING = 80;
+    private static final int CLUSTER_CENTER_PADDING = 120;
     private static final QuadTreeBoundingBox WORLD = new QuadTreeBoundingBox(-85, -180, 85, 180);
 
     private GoogleMap googleMap;
@@ -32,6 +33,7 @@ public class Clusterer<T extends Clusterable> {
     private QuadTree<T> pointsTree;
     private float oldZoomValue = 0f;
     private LatLng oldTargetValue;
+    private boolean onClusterZoom = false;
 
     private OnPaintingClusterListener onPaintingCluster;
     private OnPaintingClusterableMarkerListener onPaintingMarker;
@@ -74,7 +76,20 @@ public class Clusterer<T extends Clusterable> {
         public boolean onMarkerClick(Marker marker) {
             Cluster<T> cluster = clusterMarkers.get(marker);
             if (cluster != null) {
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(cluster.getBounds(), CLUSTER_CENTER_PADDING));
+
+                onClusterZoom = true;
+                CameraUpdate update = CameraUpdateFactory.newLatLngBounds(cluster.getBounds(), CLUSTER_CENTER_PADDING);
+                googleMap.animateCamera(update, 500, new GoogleMap.CancelableCallback() {
+                    @Override
+                    public void onFinish() {
+                        onClusterZoom = false;
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        onClusterZoom = false;
+                    }
+                });
                 return true;
             }
             return false;
@@ -123,8 +138,10 @@ public class Clusterer<T extends Clusterable> {
 
     @SuppressWarnings("unchecked")
     protected void updateMarkers() {
-        UpdateMarkersTask task = new UpdateMarkersTask(context, googleMap, onPaintingMarker, onPaintingCluster);
-        task.execute(pointsTree);
+        if (!onClusterZoom) {
+            UpdateMarkersTask task = new UpdateMarkersTask(context, googleMap, onPaintingMarker, onPaintingCluster);
+            task.execute(pointsTree);
+        }
     }
 
     private class UpdateMarkersTask extends AsyncTask<QuadTree<T>, Void, ClusteringProcessResultHolder<T>> {
@@ -214,7 +231,6 @@ public class Clusterer<T extends Clusterable> {
                 if (!addedToCluster) {
                     positions.put(position, new Cluster<T>(point));
                 }
-
             }
 
             // Prepare the result: the pois to delete and the new clusters
@@ -224,6 +240,7 @@ public class Clusterer<T extends Clusterable> {
                     result.clusters.add(cluster);
                     for (T poi : cluster.getMarkers()) {
                         result.pois.remove(poi);
+                        result.poisToDelete.add(poi);
                     }
                 }
             }
@@ -246,7 +263,7 @@ public class Clusterer<T extends Clusterable> {
             clusterMarkers.clear();
             pointMarkers.clear();
 
-            for (Cluster cluster : result.clusters) {
+            for (Cluster<T> cluster : result.clusters) {
                 Marker marker;
                 if (onPaintingCluster != null) {
                     marker = map.addMarker(onPaintingCluster.onCreateClusterMarkerOptions(cluster));
@@ -274,8 +291,8 @@ public class Clusterer<T extends Clusterable> {
         }
     }
 
-    private class ClusteringProcessResultHolder<T> {
-        public ArrayList<Cluster> clusters = new ArrayList<Cluster>();
+    private class ClusteringProcessResultHolder<T extends Clusterable> {
+        public ArrayList<Cluster<T>> clusters = new ArrayList<Cluster<T>>();
         public ArrayList<T> pois = new ArrayList<T>();
         public ArrayList<T> poisToDelete = new ArrayList<T>();
     }
