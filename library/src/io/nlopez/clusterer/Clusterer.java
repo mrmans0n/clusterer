@@ -235,11 +235,13 @@ public class Clusterer<T extends Clusterable> {
 
             // Prepare the result: the pois to delete and the new clusters
             result.poisToDelete.addAll(pointsToDelete);
+            result.poisToKeep.addAll(pointsToKeep);
             for (Cluster<T> cluster : positions.values()) {
                 if (cluster.isCluster()) {
                     result.clusters.add(cluster);
                     for (T poi : cluster.getMarkers()) {
                         result.pois.remove(poi);
+                        result.poisToKeep.remove(poi);
                         result.poisToDelete.add(poi);
                     }
                 }
@@ -257,6 +259,15 @@ public class Clusterer<T extends Clusterable> {
                 Marker marker = pointMarkers.get(poi);
                 if (marker != null) {
                     marker.remove();
+                }
+            }
+
+            for (T poi : pointMarkers.keySet()) {
+                if (!result.poisToKeep.contains(poi)) {
+                    Marker marker = pointMarkers.get(poi);
+                    if (marker != null) {
+                        marker.remove();
+                    }
                 }
             }
 
@@ -295,6 +306,7 @@ public class Clusterer<T extends Clusterable> {
         public ArrayList<Cluster<T>> clusters = new ArrayList<Cluster<T>>();
         public ArrayList<T> pois = new ArrayList<T>();
         public ArrayList<T> poisToDelete = new ArrayList<T>();
+        public ArrayList<T> poisToKeep = new ArrayList<T>();
     }
 
     public interface OnPaintingClusterableMarkerListener {
