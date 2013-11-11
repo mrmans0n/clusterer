@@ -40,6 +40,7 @@ public class Clusterer<T extends Clusterable> {
     private OnCameraChangeListener onCameraChangeListener;
     private HashMap<T, Marker> pointMarkers;
     private HashMap<Marker, Cluster<T>> clusterMarkers;
+    private List<Marker> allMarkers;
 
     public Clusterer(Context context, GoogleMap googleMap) {
         this.googleMap = googleMap;
@@ -48,6 +49,7 @@ public class Clusterer<T extends Clusterable> {
         this.googleMap.setOnMarkerClickListener(markerClicked);
         this.pointMarkers = new HashMap<T, Marker>();
         this.clusterMarkers = new HashMap<Marker, Cluster<T>>();
+        this.allMarkers = new ArrayList<Marker>();
         initQuadTree();
     }
 
@@ -251,8 +253,16 @@ public class Clusterer<T extends Clusterable> {
 
         @Override
         protected void onPostExecute(ClusteringProcessResultHolder<T> result) {
-            for (Marker marker : clusterMarkers.keySet()) {
-                marker.remove();
+
+
+            for (Marker marker: allMarkers) {
+                if (clusterMarkers.containsKey(marker)) {
+                    marker.remove();
+                }
+                // TODO: check allMarkers and delete everything that we don't want to show
+                //          1 - all clusters
+                //          2 - non existing points in result.pois
+                // Maybe using Cluster again for everything and storing it to a hashmap?
             }
 
             for (T poi : result.poisToDelete) {
@@ -284,6 +294,7 @@ public class Clusterer<T extends Clusterable> {
                             .title(Integer.valueOf(cluster.getWeight()).toString())
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 }
+                allMarkers.add(marker);
                 clusterMarkers.put(marker, cluster);
             }
 
@@ -296,6 +307,7 @@ public class Clusterer<T extends Clusterable> {
                     } else {
                         marker = map.addMarker(new MarkerOptions().position(poi.getPosition()));
                     }
+                    allMarkers.add(marker);
                     pointMarkers.put(poi, marker);
                 }
             }
