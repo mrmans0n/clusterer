@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Nacho Lopez on 28/10/13.
@@ -33,7 +34,6 @@ public class Clusterer<T extends Clusterable> {
     private QuadTree<T> pointsTree;
     private float oldZoomValue = 0f;
     private LatLng oldTargetValue;
-    private boolean onClusterZoom = false;
 
     private OnPaintingClusterListener onPaintingCluster;
     private OnPaintingClusterableMarkerListener onPaintingMarker;
@@ -41,6 +41,8 @@ public class Clusterer<T extends Clusterable> {
     private HashMap<T, Marker> pointMarkers;
     private HashMap<Marker, Cluster<T>> clusterMarkers;
     private List<Marker> allMarkers;
+    private UpdateMarkersTask task;
+
 
     public Clusterer(Context context, GoogleMap googleMap) {
         this.googleMap = googleMap;
@@ -78,20 +80,8 @@ public class Clusterer<T extends Clusterable> {
         public boolean onMarkerClick(Marker marker) {
             Cluster<T> cluster = clusterMarkers.get(marker);
             if (cluster != null) {
-
-                onClusterZoom = true;
                 CameraUpdate update = CameraUpdateFactory.newLatLngBounds(cluster.getBounds(), CLUSTER_CENTER_PADDING);
-                googleMap.animateCamera(update, 500, new GoogleMap.CancelableCallback() {
-                    @Override
-                    public void onFinish() {
-                        onClusterZoom = false;
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        onClusterZoom = false;
-                    }
-                });
+                googleMap.animateCamera(update, 500, null);
                 return true;
             }
             return false;
@@ -140,9 +130,11 @@ public class Clusterer<T extends Clusterable> {
 
     @SuppressWarnings("unchecked")
     protected void updateMarkers() {
-        if (!onClusterZoom) {
-            UpdateMarkersTask task = new UpdateMarkersTask(context, googleMap, onPaintingMarker, onPaintingCluster);
+        if (task == null || !task.isLocked()) {
+            task = new UpdateMarkersTask(context, googleMap, onPaintingMarker, onPaintingCluster);
             task.execute(pointsTree);
+        } else {
+            System.out.println("Trying to screw you up!");
         }
     }
 
@@ -154,6 +146,7 @@ public class Clusterer<T extends Clusterable> {
         private OnPaintingClusterListener onPaintingCluster;
         private Projection projection;
         private int gridInPixels;
+        private AtomicBoolean isLocked;
 
         UpdateMarkersTask(Context context, GoogleMap map, OnPaintingClusterableMarkerListener onPaintingClusterableMarker,
                           OnPaintingClusterListener onPaintingCluster) {
@@ -163,6 +156,7 @@ public class Clusterer<T extends Clusterable> {
             this.onPaintingCluster = onPaintingCluster;
             this.onPaintingClusterableMarker = onPaintingClusterableMarker;
             this.projection = map.getProjection();
+            this.isLocked = new AtomicBoolean(false);
         }
 
         private int getSizeForZoomScale(int scale) {
@@ -185,6 +179,12 @@ public class Clusterer<T extends Clusterable> {
         private boolean isInDistance(Point origin, Point other) {
             return origin.x >= other.x - gridInPixels && origin.x <= other.x + gridInPixels && origin.y >= other.y - gridInPixels
                     && origin.y <= other.y + gridInPixels;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            this.isLocked.set(true);
         }
 
         @Override
@@ -254,15 +254,8 @@ public class Clusterer<T extends Clusterable> {
         @Override
         protected void onPostExecute(ClusteringProcessResultHolder<T> result) {
 
-
-            for (Marker marker: allMarkers) {
-                if (clusterMarkers.containsKey(marker)) {
-                    marker.remove();
-                }
-                // TODO: check allMarkers and delete everything that we don't want to show
-                //          1 - all clusters
-                //          2 - non existing points in result.pois
-                // Maybe using Cluster again for everything and storing it to a hashmap?
+            for (Marker marker : clusterMarkers.keySet()) {
+                marker.remove();
             }
 
             for (T poi : result.poisToDelete) {
@@ -311,6 +304,11 @@ public class Clusterer<T extends Clusterable> {
                     pointMarkers.put(poi, marker);
                 }
             }
+            this.isLocked.set(false);
+        }
+
+        public boolean isLocked() {
+            return this.isLocked.get();
         }
     }
 
