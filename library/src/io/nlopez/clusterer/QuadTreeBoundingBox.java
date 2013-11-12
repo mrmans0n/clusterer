@@ -1,5 +1,7 @@
 package io.nlopez.clusterer;
 
+import com.google.android.gms.maps.model.LatLngBounds;
+
 /**
  * Created by Nacho L. on 04/11/13.
  */
@@ -39,8 +41,13 @@ public class QuadTreeBoundingBox {
     }
 
     private boolean containsPoint(double x, double y) {
-        boolean containsX = this.x1 <= x && this.xf >= x;
-        boolean containsY = this.y1 <= y && this.yf >= y;
+        boolean containsX = isBetween(this.x1, this.xf, x);
+        boolean containsY = isBetween(this.y1, this.yf, y);
         return containsX && containsY;
     }
+
+    private static boolean isBetween(double a, double b, double c) {
+        return b > a ? c > a && c < b : c > b && c < a;
+    }
+
 }

@@ -3,6 +3,7 @@ package io.nlopez.clusterer;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -18,7 +19,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Nacho Lopez on 28/10/13.
@@ -130,12 +130,11 @@ public class Clusterer<T extends Clusterable> {
 
     @SuppressWarnings("unchecked")
     protected void updateMarkers() {
-        if (task == null || !task.isLocked()) {
-            task = new UpdateMarkersTask(context, googleMap, onPaintingMarker, onPaintingCluster);
-            task.execute(pointsTree);
-        } else {
-            System.out.println("Trying to screw you up!");
+        if (task != null) {
+            task.cancel(false);
         }
+        task = new UpdateMarkersTask(context, googleMap, onPaintingMarker, onPaintingCluster);
+        task.execute(pointsTree);
     }
 
     private class UpdateMarkersTask extends AsyncTask<QuadTree<T>, Void, ClusteringProcessResultHolder<T>> {
@@ -146,7 +145,6 @@ public class Clusterer<T extends Clusterable> {
         private OnPaintingClusterListener onPaintingCluster;
         private Projection projection;
         private int gridInPixels;
-        private AtomicBoolean isLocked;
 
         UpdateMarkersTask(Context context, GoogleMap map, OnPaintingClusterableMarkerListener onPaintingClusterableMarker,
                           OnPaintingClusterListener onPaintingCluster) {
@@ -156,7 +154,6 @@ public class Clusterer<T extends Clusterable> {
             this.onPaintingCluster = onPaintingCluster;
             this.onPaintingClusterableMarker = onPaintingClusterableMarker;
             this.projection = map.getProjection();
-            this.isLocked = new AtomicBoolean(false);
         }
 
         private int getSizeForZoomScale(int scale) {
@@ -182,12 +179,6 @@ public class Clusterer<T extends Clusterable> {
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            this.isLocked.set(true);
-        }
-
-        @Override
         protected ClusteringProcessResultHolder doInBackground(QuadTree<T>... params) {
 
             ClusteringProcessResultHolder<T> result = new ClusteringProcessResultHolder<T>();
@@ -205,6 +196,8 @@ public class Clusterer<T extends Clusterable> {
             QuadTreeBoundingBox boundingBox = new QuadTreeBoundingBox(x1, y1, xf, yf);
             ArrayList<T> pointsInRegion = new ArrayList<T>();
             tree.getPointsInRange(boundingBox, pointsInRegion);
+
+            Log.i("Clusterer", "detected points in range = " + pointsInRegion.size());
 
             // We got here the points we want to show show
             result.pois.addAll(pointsInRegion);
@@ -248,11 +241,15 @@ public class Clusterer<T extends Clusterable> {
                     }
                 }
             }
-            return result;
+            Log.i("Clusterer", "points to delete" + pointsToDelete.size());
+
+            return (isCancelled()) ? null : result;
         }
 
         @Override
         protected void onPostExecute(ClusteringProcessResultHolder<T> result) {
+
+            if (result == null) return;
 
             for (Marker marker : clusterMarkers.keySet()) {
                 marker.remove();
@@ -304,11 +301,6 @@ public class Clusterer<T extends Clusterable> {
                     pointMarkers.put(poi, marker);
                 }
             }
-            this.isLocked.set(false);
-        }
-
-        public boolean isLocked() {
-            return this.isLocked.get();
         }
     }
 
