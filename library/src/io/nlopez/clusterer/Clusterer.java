@@ -19,6 +19,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by Nacho Lopez on 28/10/13.
@@ -42,6 +44,7 @@ public class Clusterer<T extends Clusterable> {
     private HashMap<Marker, Cluster<T>> clusterMarkers;
     private List<Marker> allMarkers;
     private UpdateMarkersTask task;
+    private final Lock updatingLock = new ReentrantLock();
 
 
     public Clusterer(Context context, GoogleMap googleMap) {
@@ -197,8 +200,6 @@ public class Clusterer<T extends Clusterable> {
             ArrayList<T> pointsInRegion = new ArrayList<T>();
             tree.getPointsInRange(boundingBox, pointsInRegion);
 
-            Log.i("Clusterer", "detected points in range = " + pointsInRegion.size());
-
             // We got here the points we want to show show
             result.pois.addAll(pointsInRegion);
 
@@ -241,7 +242,6 @@ public class Clusterer<T extends Clusterable> {
                     }
                 }
             }
-            Log.i("Clusterer", "points to delete" + pointsToDelete.size());
 
             return (isCancelled()) ? null : result;
         }
@@ -251,15 +251,20 @@ public class Clusterer<T extends Clusterable> {
 
             if (result == null) return;
 
+            updatingLock.lock();
+
             for (Marker marker : clusterMarkers.keySet()) {
                 marker.remove();
             }
+            clusterMarkers.clear();
 
+            List<T> deleted = new ArrayList<T>();
             for (T poi : result.poisToDelete) {
                 Marker marker = pointMarkers.get(poi);
                 if (marker != null) {
                     marker.remove();
                 }
+                deleted.add(poi);
             }
 
             for (T poi : pointMarkers.keySet()) {
@@ -268,11 +273,14 @@ public class Clusterer<T extends Clusterable> {
                     if (marker != null) {
                         marker.remove();
                     }
+                    deleted.add(poi);
                 }
             }
 
-            clusterMarkers.clear();
-            pointMarkers.clear();
+            for (T poi : deleted) {
+                Marker marker = pointMarkers.remove(poi);
+                allMarkers.remove(marker);
+            }
 
             for (Cluster<T> cluster : result.clusters) {
                 Marker marker;
@@ -301,6 +309,8 @@ public class Clusterer<T extends Clusterable> {
                     pointMarkers.put(poi, marker);
                 }
             }
+
+            updatingLock.unlock();
         }
     }
 
