@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import io.nlopez.clusterer.Cluster;
 import io.nlopez.clusterer.Clusterable;
@@ -51,21 +52,33 @@ public class MainActivity extends Activity {
 
     private void createDummyLocations() {
         pointsOfInterest = new ArrayList<PointOfInterest>();
-        pointsOfInterest.add(new PointOfInterest(new LatLng(39.4094747, -7.24561540000002), "Perry's house", "Very beautiful"));
-        pointsOfInterest.add(new PointOfInterest(new LatLng(39.4701005, -0.3769916999999623), "SCUMM bar",
-                "It's just testimonial"));
-        pointsOfInterest.add(new PointOfInterest(new LatLng(38.6340369, -0.13612690000002203), "The fifth pine",
-                "Cluttered and always crowded"));
-        pointsOfInterest.add(new PointOfInterest(new LatLng(39.4753029, -0.37543890000006286), "Bernarda's junk",
-                "Very beautiful, various styles"));
-        pointsOfInterest.add(new PointOfInterest(new LatLng(39.48158069999999, -0.3436993000000257), "Bar Cenas",
-                "Best envelopes"));
-        pointsOfInterest.add(new PointOfInterest(new LatLng(39.4699075, -0.3762881000000107), "Cottolengo",
-                "Greatest munye-munye I've ever tasted"));
-        pointsOfInterest.add(new PointOfInterest(new LatLng(39.5699075, -0.3762881000000107), "Perry Meison",
-                "A test point"));
-        pointsOfInterest.add(new PointOfInterest(new LatLng(39.4699075, -0.5762881000000107), "Meison Burgz",
-                "Boooooring!"));
+        Random r = new Random();
+        for (int i = 0; i < 10; i++) {
+
+            double offsetLat = r.nextGaussian();
+            double offsetLong = r.nextGaussian();
+
+            pointsOfInterest.add(new PointOfInterest(new LatLng(39.4094747 + offsetLat, -7.24561540000002 + offsetLong), "Perry's house", "Very beautiful"));
+            pointsOfInterest.add(new PointOfInterest(new LatLng(39.4701005 + offsetLat, -0.3769916999999623 + offsetLong), "SCUMM bar",
+                    "It's just testimonial"));
+            pointsOfInterest.add(new PointOfInterest(new LatLng(38.6340369 + offsetLat, -0.13612690000002203 + offsetLong), "The fifth pine",
+                    "Cluttered and always crowded"));
+            pointsOfInterest.add(new PointOfInterest(new LatLng(39.4753029 + offsetLat, -0.37543890000006286 + offsetLong), "Bernarda's junk",
+                    "Very beautiful, various styles"));
+            pointsOfInterest.add(new PointOfInterest(new LatLng(39.48158069999999 + offsetLat, -0.3436993000000257 + offsetLong), "Bar Cenas",
+                    "Best envelopes"));
+            pointsOfInterest.add(new PointOfInterest(new LatLng(39.4699075 + offsetLat, -0.3762881000000107 + offsetLong), "Cottolengo",
+                    "Greatest munye-munye I've ever tasted"));
+            pointsOfInterest.add(new PointOfInterest(new LatLng(39.5699075 + offsetLat, -0.3762881000000107 + offsetLong), "Perry Meison",
+                    "A test point"));
+            pointsOfInterest.add(new PointOfInterest(new LatLng(39.4699075 + offsetLat, -0.5762881000000107 + offsetLong), "Meison Burgz",
+                    "Even more boring!"));
+            pointsOfInterest.add(new PointOfInterest(new LatLng(40.4699075 + offsetLat, -0.6762881000000107 + offsetLong), "Murm",
+                    "Don't know what to write!"));
+            pointsOfInterest.add(new PointOfInterest(new LatLng(37.4699075 + offsetLat, -0.8762881000000107 + offsetLong), "Momansón",
+                    "Ugh!"));
+
+        }
     }
 
     private void moveMap() {

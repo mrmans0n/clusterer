@@ -1,7 +1,5 @@
 package io.nlopez.clusterer;
 
-import com.google.android.gms.maps.model.LatLngBounds;
-
 /**
  * Created by Nacho L. on 04/11/13.
  */
@@ -37,7 +35,10 @@ public class QuadTreeBoundingBox {
     }
 
     public boolean isIntersecting(QuadTreeBoundingBox other) {
-        return containsPoint(other.getX1(), other.getY1()) || containsPoint(other.getXf(), other.getYf());
+        return containsPoint(other.getX1(), other.getY1()) ||
+                containsPoint(other.getXf(), other.getYf()) ||
+                containsPoint(other.getXf(), other.getY1()) ||
+                containsPoint(other.getX1(), other.getYf());
     }
 
     private boolean containsPoint(double x, double y) {
