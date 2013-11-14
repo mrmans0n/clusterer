@@ -35,10 +35,7 @@ public class QuadTreeBoundingBox {
     }
 
     public boolean isIntersecting(QuadTreeBoundingBox other) {
-        return containsPoint(other.getX1(), other.getY1()) ||
-                containsPoint(other.getXf(), other.getYf()) ||
-                containsPoint(other.getXf(), other.getY1()) ||
-                containsPoint(other.getX1(), other.getYf());
+        return this.x1 <= other.getXf() && this.xf >= other.getX1() && this.y1 <= other.getYf() && this.yf >= other.getY1();
     }
 
     private boolean containsPoint(double x, double y) {

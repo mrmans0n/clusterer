@@ -3,7 +3,6 @@ package io.nlopez.clusterer;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -27,7 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Clusterer<T extends Clusterable> {
 
-    private static final int NODE_CAPACITY = 4;
+    private static final int NODE_CAPACITY = 10;
     private static final int CLUSTER_CENTER_PADDING = 120;
     private static final QuadTreeBoundingBox WORLD = new QuadTreeBoundingBox(-85, -180, 85, 180);
 
@@ -192,10 +191,10 @@ public class Clusterer<T extends Clusterable> {
             List<T> pointsToDelete = new ArrayList<T>(pointMarkers.keySet());
 
             // Get x1,y1,xf,yf from bounds
-            double x1 = bounds.southwest.latitude;
-            double y1 = bounds.northeast.longitude;
-            double xf = bounds.northeast.latitude;
-            double yf = bounds.southwest.longitude;
+            double x1 = Math.min(bounds.southwest.latitude, bounds.northeast.latitude);
+            double y1 = Math.min(bounds.northeast.longitude, bounds.southwest.longitude);
+            double xf = Math.max(bounds.southwest.latitude, bounds.northeast.latitude);
+            double yf = Math.max(bounds.northeast.longitude, bounds.southwest.longitude);
             QuadTreeBoundingBox boundingBox = new QuadTreeBoundingBox(x1, y1, xf, yf);
             ArrayList<T> pointsInRegion = new ArrayList<T>();
             tree.getPointsInRange(boundingBox, pointsInRegion);

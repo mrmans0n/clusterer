@@ -6,6 +6,7 @@ import java.util.ArrayList;
  * Created by Nacho L. on 04/11/13.
  */
 public class QuadTreeNode<T extends Clusterable> {
+    private static int counter = 0;
     private QuadTreeNode<T> northWest;
     private QuadTreeNode<T> northEast;
     private QuadTreeNode<T> southWest;
@@ -67,6 +68,7 @@ public class QuadTreeNode<T extends Clusterable> {
         if (!boundingBox.isIntersecting(range)) {
             return;
         }
+
         if (points != null) {
             for (T element : nodeData) {
                 if (range.containsData(element)) {
