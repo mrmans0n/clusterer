@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -141,7 +142,7 @@ public class Clusterer<T extends Clusterable> {
 
     private class UpdateMarkersTask extends AsyncTask<QuadTree<T>, Void, ClusteringProcessResultHolder<T>> {
 
-        private GoogleMap map;
+        private WeakReference<GoogleMap> map;
         private LatLngBounds bounds;
         private OnPaintingClusterableMarkerListener onPaintingClusterableMarker;
         private OnPaintingClusterListener onPaintingCluster;
@@ -150,7 +151,7 @@ public class Clusterer<T extends Clusterable> {
 
         UpdateMarkersTask(Context context, GoogleMap map, OnPaintingClusterableMarkerListener onPaintingClusterableMarker,
                           OnPaintingClusterListener onPaintingCluster) {
-            this.map = map;
+            this.map = new WeakReference<GoogleMap>(map);
             this.bounds = map.getProjection().getVisibleRegion().latLngBounds;
             this.gridInPixels = (int) (getSizeForZoomScale((int) map.getCameraPosition().zoom) * context.getResources().getDisplayMetrics().density + 0.5f);
             this.onPaintingCluster = onPaintingCluster;
@@ -181,7 +182,7 @@ public class Clusterer<T extends Clusterable> {
         }
 
         @Override
-        protected ClusteringProcessResultHolder doInBackground(QuadTree<T>... params) {
+        protected ClusteringProcessResultHolder<T> doInBackground(QuadTree<T>... params) {
 
             ClusteringProcessResultHolder<T> result = new ClusteringProcessResultHolder<T>();
             QuadTree<T> tree = params[0];
@@ -280,14 +281,17 @@ public class Clusterer<T extends Clusterable> {
                 Marker marker = pointMarkers.remove(poi);
                 allMarkers.remove(marker);
             }
+            GoogleMap strongMap = map.get();
+
+            if (strongMap == null) return;
 
             for (Cluster<T> cluster : result.clusters) {
                 Marker marker;
                 if (onPaintingCluster != null) {
-                    marker = map.addMarker(onPaintingCluster.onCreateClusterMarkerOptions(cluster));
+                    marker = strongMap.addMarker(onPaintingCluster.onCreateClusterMarkerOptions(cluster));
                     onPaintingCluster.onMarkerCreated(marker, cluster);
                 } else {
-                    marker = map.addMarker(new MarkerOptions().position(cluster.getCenter())
+                    marker = strongMap.addMarker(new MarkerOptions().position(cluster.getCenter())
                             .title(Integer.valueOf(cluster.getWeight()).toString())
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 }
@@ -299,10 +303,10 @@ public class Clusterer<T extends Clusterable> {
                 if (!pointMarkers.containsKey(poi)) {
                     Marker marker;
                     if (onPaintingClusterableMarker != null) {
-                        marker = map.addMarker(onPaintingClusterableMarker.onCreateMarkerOptions(poi));
+                        marker = strongMap.addMarker(onPaintingClusterableMarker.onCreateMarkerOptions(poi));
                         onPaintingClusterableMarker.onMarkerCreated(marker, poi);
                     } else {
-                        marker = map.addMarker(new MarkerOptions().position(poi.getPosition()));
+                        marker = strongMap.addMarker(new MarkerOptions().position(poi.getPosition()));
                     }
                     allMarkers.add(marker);
                     pointMarkers.put(poi, marker);
