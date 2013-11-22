@@ -148,12 +148,14 @@ public class Clusterer<T extends Clusterable> {
         private OnPaintingClusterListener onPaintingCluster;
         private Projection projection;
         private int gridInPixels;
+        private float zoomScale;
 
         UpdateMarkersTask(Context context, GoogleMap map, OnPaintingClusterableMarkerListener onPaintingClusterableMarker,
                           OnPaintingClusterListener onPaintingCluster) {
             this.map = new WeakReference<GoogleMap>(map);
             this.bounds = map.getProjection().getVisibleRegion().latLngBounds;
-            this.gridInPixels = (int) (getSizeForZoomScale((int) map.getCameraPosition().zoom) * context.getResources().getDisplayMetrics().density + 0.5f);
+            this.zoomScale = map.getCameraPosition().zoom;
+            this.gridInPixels = (int) (getSizeForZoomScale((int) zoomScale) * context.getResources().getDisplayMetrics().density + 0.5f);
             this.onPaintingCluster = onPaintingCluster;
             this.onPaintingClusterableMarker = onPaintingClusterableMarker;
             this.projection = map.getProjection();
@@ -196,6 +198,7 @@ public class Clusterer<T extends Clusterable> {
             double y1 = Math.min(bounds.northeast.longitude, bounds.southwest.longitude);
             double xf = Math.max(bounds.southwest.latitude, bounds.northeast.latitude);
             double yf = Math.max(bounds.northeast.longitude, bounds.southwest.longitude);
+
             QuadTreeBoundingBox boundingBox = new QuadTreeBoundingBox(x1, y1, xf, yf);
             ArrayList<T> pointsInRegion = new ArrayList<T>();
             tree.getPointsInRange(boundingBox, pointsInRegion);

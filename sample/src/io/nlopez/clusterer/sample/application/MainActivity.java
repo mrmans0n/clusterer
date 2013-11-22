@@ -34,9 +34,11 @@ import io.nlopez.clusterer.sample.model.PointOfInterest;
  */
 public class MainActivity extends Activity {
 
-    GoogleMap map;
-    List<PointOfInterest> pointsOfInterest;
-    Clusterer clusterer;
+    private static final int CLUSTER_BASE_SIZE = 20;
+
+    private GoogleMap map;
+    private List<PointOfInterest> pointsOfInterest;
+    private Clusterer<PointOfInterest> clusterer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,12 +89,8 @@ public class MainActivity extends Activity {
     }
 
     private void initClusterer() {
-        clusterer = new Clusterer(this, map);
-        List<Clusterable> clusterables = new ArrayList<Clusterable>();
-        for (PointOfInterest poi : pointsOfInterest) {
-            clusterables.add(poi);
-        }
-        clusterer.addAll(clusterables);
+        clusterer = new Clusterer<PointOfInterest>(this, map);
+        clusterer.addAll(pointsOfInterest);
 
         clusterer.setOnPaintingMarkerListener(new Clusterer.OnPaintingClusterableMarkerListener() {
 
@@ -128,6 +126,9 @@ public class MainActivity extends Activity {
     }
 
     private Bitmap getClusteredLabel(Integer count, Context ctx) {
+
+        float density = getResources().getDisplayMetrics().density;
+
         Resources r = ctx.getResources();
         Bitmap res = BitmapFactory.decodeResource(r, R.drawable.circle_red);
         res = res.copy(Bitmap.Config.ARGB_8888, true);
@@ -138,12 +139,12 @@ public class MainActivity extends Activity {
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setTypeface(Typeface.DEFAULT_BOLD);
         textPaint.setColor(Color.WHITE);
-        float density = getResources().getDisplayMetrics().density;
         textPaint.setTextSize(16 * density);
 
         c.drawText(String.valueOf(count.toString()), res.getWidth() / 2, res.getHeight() / 2 + textPaint.getTextSize() / 3, textPaint);
 
         return res;
     }
+
 
 }
