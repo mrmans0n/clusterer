@@ -70,15 +70,19 @@ public class Cluster<T extends Clusterable> implements Clusterable {
         Cluster cluster = (Cluster) o;
 
         if (center != null ? !center.equals(cluster.center) : cluster.center != null) return false;
-        if (!markers.equals(cluster.markers)) return false;
+        if (latitudeSum != null ? !latitudeSum.equals(cluster.latitudeSum) : cluster.latitudeSum != null)
+            return false;
+        if (longitudeSum != null ? !longitudeSum.equals(cluster.longitudeSum) : cluster.longitudeSum != null)
+            return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = markers.hashCode();
-        result = 31 * result + (center != null ? center.hashCode() : 0);
+        int result = center != null ? center.hashCode() : 0;
+        result = 31 * result + (latitudeSum != null ? latitudeSum.hashCode() : 0);
+        result = 31 * result + (longitudeSum != null ? longitudeSum.hashCode() : 0);
         return result;
     }
 }

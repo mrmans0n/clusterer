@@ -35,6 +35,8 @@ public class Clusterer<T extends Clusterable> {
     private static final int CLUSTER_CENTER_PADDING = 120;
     private static final QuadTreeBoundingBox WORLD = new QuadTreeBoundingBox(-85, -180, 85, 180);
     public static final int UPDATE_INTERVAL_TIME = 500;
+    public static final int CAMERA_ANIMATION_DURATION = 500;
+    public static final int FADE_ANIMATION_DURATION = 400;
 
     private GoogleMap googleMap;
     private Context context;
@@ -101,7 +103,7 @@ public class Clusterer<T extends Clusterable> {
             Cluster<T> cluster = clusterMarkers.get(marker);
             if (cluster != null) {
                 CameraUpdate update = CameraUpdateFactory.newLatLngBounds(cluster.getBounds(), CLUSTER_CENTER_PADDING);
-                googleMap.animateCamera(update, 500, null);
+                googleMap.animateCamera(update, CAMERA_ANIMATION_DURATION, null);
                 return true;
             }
             return false;
@@ -262,6 +264,13 @@ public class Clusterer<T extends Clusterable> {
                     }
                 }
             }
+            for (Cluster<T> cluster : clusterMarkers.values()) {
+                if (result.clusters.contains(cluster)) {
+                    result.clustersToKeep.add(cluster);
+                } else {
+                    result.clustersToDelete.add(cluster);
+                }
+            }
 
             return (isCancelled()) ? null : result;
         }
@@ -274,11 +283,19 @@ public class Clusterer<T extends Clusterable> {
             updatingLock.lock();
 
             // Remove all cluster marks (they will be regenerated)
-            // TODO try to find the clusters that will be untouched and not remove them
+            List<Marker> deletedClusters = new ArrayList<Marker>();
             for (Marker marker : clusterMarkers.keySet()) {
-                marker.remove();
+                Cluster<T> cluster = clusterMarkers.get(marker);
+                if (result.clustersToDelete.contains(cluster)) {
+                    marker.remove();
+                    deletedClusters.add(marker);
+                }
             }
-            clusterMarkers.clear();
+
+            // Delete clusters marked for deletion
+            for (Marker marker : deletedClusters) {
+                clusterMarkers.remove(marker);
+            }
 
             // Mark for deletion all the pois that wont be shown in the map
             List<T> deleted = new ArrayList<T>();
@@ -316,18 +333,21 @@ public class Clusterer<T extends Clusterable> {
 
             // Generate all the clusters
             for (Cluster<T> cluster : result.clusters) {
-                Marker marker;
-                if (onPaintingCluster != null) {
-                    marker = strongMap.addMarker(onPaintingCluster.onCreateClusterMarkerOptions(cluster));
-                    onPaintingCluster.onMarkerCreated(marker, cluster);
-                } else {
-                    marker = strongMap.addMarker(new MarkerOptions().position(cluster.getCenter())
-                            .title(Integer.valueOf(cluster.getWeight()).toString())
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                if (!result.clustersToKeep.contains(cluster)) {
+                    Marker marker;
+                    if (onPaintingCluster != null) {
+                        marker = strongMap.addMarker(onPaintingCluster.onCreateClusterMarkerOptions(cluster));
+                        onPaintingCluster.onMarkerCreated(marker, cluster);
+                    } else {
+                        marker = strongMap.addMarker(new MarkerOptions().position(cluster.getCenter())
+                                .title(Integer.valueOf(cluster.getWeight()).toString())
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    }
+
+                    allMarkers.add(marker);
+                    newlyAddedMarkers.add(marker);
+                    clusterMarkers.put(marker, cluster);
                 }
-                allMarkers.add(marker);
-                newlyAddedMarkers.add(marker);
-                clusterMarkers.put(marker, cluster);
             }
 
             // Generate all the pois
@@ -356,14 +376,13 @@ public class Clusterer<T extends Clusterable> {
     private void animateRecentlyAddedMarkers(final List<Marker> newlyAddedMarkers) {
         final Interpolator interpolator = new LinearInterpolator();
         final long start = SystemClock.uptimeMillis();
-        // TODO parametrize this and add as a constant
-        final long duration = 400;
         final Handler handler = new Handler();
+
         handler.post(new Runnable() {
             @Override
             public void run() {
                 long elapsed = SystemClock.uptimeMillis() - start;
-                float t = interpolator.getInterpolation((float) elapsed / duration);
+                float t = interpolator.getInterpolation((float) elapsed / FADE_ANIMATION_DURATION);
 
                 for (Marker marker : newlyAddedMarkers) {
                     marker.setAlpha(t);
@@ -379,6 +398,8 @@ public class Clusterer<T extends Clusterable> {
 
     private class ClusteringProcessResultHolder<T extends Clusterable> {
         public ArrayList<Cluster<T>> clusters = new ArrayList<Cluster<T>>();
+        public ArrayList<Cluster<T>> clustersToDelete = new ArrayList<Cluster<T>>();
+        public ArrayList<Cluster<T>> clustersToKeep = new ArrayList<Cluster<T>>();
         public ArrayList<T> pois = new ArrayList<T>();
         public ArrayList<T> poisToDelete = new ArrayList<T>();
         public ArrayList<T> poisToKeep = new ArrayList<T>();
