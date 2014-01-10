@@ -3,6 +3,10 @@ package io.nlopez.clusterer;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,6 +34,7 @@ public class Clusterer<T extends Clusterable> {
     private static final int NODE_CAPACITY = 10;
     private static final int CLUSTER_CENTER_PADDING = 120;
     private static final QuadTreeBoundingBox WORLD = new QuadTreeBoundingBox(-85, -180, 85, 180);
+    public static final int UPDATE_INTERVAL_TIME = 500;
 
     private GoogleMap googleMap;
     private Context context;
@@ -44,7 +49,8 @@ public class Clusterer<T extends Clusterable> {
     private HashMap<Marker, Cluster<T>> clusterMarkers;
     private List<Marker> allMarkers;
     private UpdateMarkersTask task;
-    private final Lock updatingLock = new ReentrantLock();
+    private final Lock updatingLock;
+    private final Handler refreshHandler;
 
 
     public Clusterer(Context context, GoogleMap googleMap) {
@@ -55,6 +61,8 @@ public class Clusterer<T extends Clusterable> {
         this.pointMarkers = new HashMap<T, Marker>();
         this.clusterMarkers = new HashMap<Marker, Cluster<T>>();
         this.allMarkers = new ArrayList<Marker>();
+        this.refreshHandler = new Handler();
+        this.updatingLock = new ReentrantLock();
         initQuadTree();
     }
 
@@ -70,11 +78,20 @@ public class Clusterer<T extends Clusterable> {
                 oldZoomValue = cameraPosition.zoom;
                 oldTargetValue = cameraPosition.target;
 
-                updateMarkers();
+                refreshHandler.removeCallbacks(updateMarkersRunnable);
+                refreshHandler.postDelayed(updateMarkersRunnable, UPDATE_INTERVAL_TIME);
+
             }
             if (onCameraChangeListener != null) {
                 onCameraChangeListener.onCameraChange(cameraPosition);
             }
+        }
+    };
+
+    private Runnable updateMarkersRunnable = new Runnable() {
+        @Override
+        public void run() {
+            updateMarkers();
         }
     };
 
@@ -256,11 +273,14 @@ public class Clusterer<T extends Clusterable> {
 
             updatingLock.lock();
 
+            // Remove all cluster marks (they will be regenerated)
+            // TODO try to find the clusters that will be untouched and not remove them
             for (Marker marker : clusterMarkers.keySet()) {
                 marker.remove();
             }
             clusterMarkers.clear();
 
+            // Mark for deletion all the pois that wont be shown in the map
             List<T> deleted = new ArrayList<T>();
             for (T poi : result.poisToDelete) {
                 Marker marker = pointMarkers.get(poi);
@@ -270,6 +290,7 @@ public class Clusterer<T extends Clusterable> {
                 deleted.add(poi);
             }
 
+            // Fixes for possible errors
             for (T poi : pointMarkers.keySet()) {
                 if (!result.pois.contains(poi)) {
                     Marker marker = pointMarkers.get(poi);
@@ -280,14 +301,20 @@ public class Clusterer<T extends Clusterable> {
                 }
             }
 
+            // Actually remove the non shown pois
             for (T poi : deleted) {
                 Marker marker = pointMarkers.remove(poi);
                 allMarkers.remove(marker);
             }
+
+            // Retrieve the map from the weak reference to operate with it
             GoogleMap strongMap = map.get();
 
             if (strongMap == null) return;
 
+            ArrayList<Marker> newlyAddedMarkers = new ArrayList<Marker>();
+
+            // Generate all the clusters
             for (Cluster<T> cluster : result.clusters) {
                 Marker marker;
                 if (onPaintingCluster != null) {
@@ -299,9 +326,11 @@ public class Clusterer<T extends Clusterable> {
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 }
                 allMarkers.add(marker);
+                newlyAddedMarkers.add(marker);
                 clusterMarkers.put(marker, cluster);
             }
 
+            // Generate all the pois
             for (T poi : result.pois) {
                 if (!pointMarkers.containsKey(poi)) {
                     Marker marker;
@@ -312,12 +341,40 @@ public class Clusterer<T extends Clusterable> {
                         marker = strongMap.addMarker(new MarkerOptions().position(poi.getPosition()));
                     }
                     allMarkers.add(marker);
+                    newlyAddedMarkers.add(marker);
                     pointMarkers.put(poi, marker);
                 }
             }
 
+            // Animate the new additions
+            animateRecentlyAddedMarkers(newlyAddedMarkers);
+
             updatingLock.unlock();
         }
+    }
+
+    private void animateRecentlyAddedMarkers(final List<Marker> newlyAddedMarkers) {
+        final Interpolator interpolator = new LinearInterpolator();
+        final long start = SystemClock.uptimeMillis();
+        // TODO parametrize this and add as a constant
+        final long duration = 400;
+        final Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                long elapsed = SystemClock.uptimeMillis() - start;
+                float t = interpolator.getInterpolation((float) elapsed / duration);
+
+                for (Marker marker : newlyAddedMarkers) {
+                    marker.setAlpha(t);
+                }
+
+                if (t < 1.0) {
+                    handler.postDelayed(this, 16); // 16ms = 60fps
+                }
+            }
+        });
+
     }
 
     private class ClusteringProcessResultHolder<T extends Clusterable> {
