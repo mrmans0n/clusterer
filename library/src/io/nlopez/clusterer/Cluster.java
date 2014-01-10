@@ -11,8 +11,6 @@ import java.util.List;
  */
 public class Cluster<T extends Clusterable> implements Clusterable {
 
-    private static final double BOUNDS_OFFSET = 0.1;
-
     private List<T> markers = new ArrayList<T>();
     private LatLng center;
     private Double latitudeSum;
@@ -62,5 +60,25 @@ public class Cluster<T extends Clusterable> implements Clusterable {
     @Override
     public LatLng getPosition() {
         return getCenter();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Cluster)) return false;
+
+        Cluster cluster = (Cluster) o;
+
+        if (center != null ? !center.equals(cluster.center) : cluster.center != null) return false;
+        if (!markers.equals(cluster.markers)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = markers.hashCode();
+        result = 31 * result + (center != null ? center.hashCode() : 0);
+        return result;
     }
 }
