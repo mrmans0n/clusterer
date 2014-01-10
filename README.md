@@ -28,6 +28,25 @@ And you should use my repository in your pom.xml too:
 </repository>
 ```
 
+### Gradle
+
+The dependency is:
+
+```groovy
+ compile 'io.nlopez.clusterer:library:1.0.1-SNAPSHOT'
+```
+
+And the repository is:
+```groovy
+repositories {
+
+    mavenCentral()
+    // ... blah blah the rest of your repositories ...
+
+    maven { url 'http://maven.nlopez.io:8081/artifactory/repo' }
+}
+```
+
 Preparing your app
 ------------------
 
