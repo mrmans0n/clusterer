@@ -50,7 +50,7 @@ repositories {
 Preparing your app
 ------------------
 
-You should have a working Google Maps v2 in your application, with the proper keys and all the stuff needed. Then you should follow these steps.
+You should have a working Google Maps v2 (the one from Google Play Services 13+) in your application, with the proper keys and all the stuff needed. Then you should follow these steps.
 
 ### In your Model
 
