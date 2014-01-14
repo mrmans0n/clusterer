@@ -8,6 +8,25 @@ Getting Started
 
 You can add the project with maven or gradle via adding the appropiate dependence.
 
+### Gradle
+
+The dependency is:
+
+```groovy
+ compile 'io.nlopez.clusterer:library:1.0.1-SNAPSHOT'
+```
+
+And the repository is:
+```groovy
+repositories {
+
+    mavenCentral()
+    // ... blah blah the rest of your repositories ...
+
+    maven { url 'http://maven.nlopez.io:8081/artifactory/repo' }
+}
+```
+
 ### Maven
 
 The dependency is:
@@ -26,25 +45,6 @@ And you should use my repository in your pom.xml too:
     <id>nlopez-repository</id>
     <url>http://maven.nlopez.io:8081/artifactory/repo</url>
 </repository>
-```
-
-### Gradle
-
-The dependency is:
-
-```groovy
- compile 'io.nlopez.clusterer:library:1.0.1-SNAPSHOT'
-```
-
-And the repository is:
-```groovy
-repositories {
-
-    mavenCentral()
-    // ... blah blah the rest of your repositories ...
-
-    maven { url 'http://maven.nlopez.io:8081/artifactory/repo' }
-}
 ```
 
 Preparing your app
