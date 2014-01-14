@@ -13,7 +13,7 @@ You can add the project with maven or gradle via adding the appropiate dependenc
 The dependency is:
 
 ```groovy
- compile 'io.nlopez.clusterer:library:1.0.1-SNAPSHOT'
+ compile 'io.nlopez.clusterer:library:1.0.1'
 ```
 
 And the repository is:
@@ -35,7 +35,7 @@ The dependency is:
 <dependency>
 	<groupId>io.nlopez.clusterer</groupId>
 	<artifactId>library</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 </dependency>
 ```
 

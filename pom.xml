@@ -4,7 +4,7 @@
 	<groupId>io.nlopez.clusterer</groupId>
 	<artifactId>parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<name>Clusterer</name>
 	<description>Android library project that intends to easily create POI Clusters for Maps v2
     </description>
@@ -30,7 +30,7 @@
 		<url>https://github.com/mrmans0n/clusterer/issues</url>
 	</issueManagement>
 	<properties>
-		<clusterer.version>1.0.1-SNAPSHOT</clusterer.version>
+		<clusterer.version>1.0.1</clusterer.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.6</java.version>
@@ -50,18 +50,6 @@
 				<groupId>android.support</groupId>
 				<artifactId>compatibility-v4</artifactId>
 				<version>${android-support.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.google.android.gms</groupId>
-				<artifactId>google-play-services</artifactId>
-				<version>13.0.0</version>
-				<type>apklib</type>
-			</dependency>
-			<dependency>
-				<groupId>com.google.android.gms</groupId>
-				<artifactId>google-play-services</artifactId>
-				<version>13.0.0</version>
-				<type>jar</type>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

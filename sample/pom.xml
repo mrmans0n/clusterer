@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>io.nlopez.clusterer</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<dependencies>
@@ -23,9 +23,21 @@
 		<dependency>
 			<groupId>io.nlopez.clusterer</groupId>
 			<artifactId>library</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>1.0.1</version>
 			<type>apklib</type>
 		</dependency>
+        <dependency>
+            <groupId>com.google.android.gms</groupId>
+            <artifactId>google-play-services</artifactId>
+            <version>13.0.0</version>
+            <type>apklib</type>
+        </dependency>
+        <dependency>
+            <groupId>com.google.android.gms</groupId>
+            <artifactId>google-play-services</artifactId>
+            <version>13.0.0</version>
+            <type>jar</type>
+        </dependency>
 	</dependencies>
 	<build>
 		<sourceDirectory>src</sourceDirectory>

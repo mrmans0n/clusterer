@@ -8,12 +8,12 @@
     <parent>
         <groupId>io.nlopez.clusterer</groupId>
         <artifactId>parent</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>library</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <name>Clusterer Library</name>
     <packaging>apklib</packaging>
 
@@ -26,18 +26,21 @@
 		<dependency>
 			<groupId>android.support</groupId>
 			<artifactId>compatibility-v4</artifactId>
-		</dependency>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.google.android.gms</groupId>
             <artifactId>google-play-services</artifactId>
             <version>13.0.0</version>
             <type>apklib</type>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.android.gms</groupId>
             <artifactId>google-play-services</artifactId>
             <version>13.0.0</version>
             <type>jar</type>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
