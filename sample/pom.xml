@@ -24,7 +24,6 @@
 			<groupId>io.nlopez.clusterer</groupId>
 			<artifactId>library</artifactId>
 			<version>1.0.1</version>
-			<type>apklib</type>
 		</dependency>
         <dependency>
             <groupId>com.google.android.gms</groupId>

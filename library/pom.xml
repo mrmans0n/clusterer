@@ -15,7 +15,7 @@
     <artifactId>library</artifactId>
     <version>1.0.1</version>
     <name>Clusterer Library</name>
-    <packaging>apklib</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
