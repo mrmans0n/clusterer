@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="io.nlopez.clusterer"
+          android:versionCode="10002"
+          android:versionName="1.0.2">
+
+    <!-- For simplicity purposes we won't add permissions for Google Maps in the library -->
+    <!-- You should implement it like in the tutorials https://developers.google.com/maps/documentation/android/start -->
+
+    <!-- The empty application tag is required so the manifest merge does not fail -->
+    <application>
+    </application>
+</manifest>

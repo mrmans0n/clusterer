@@ -10,26 +10,11 @@ You can add the project with maven or gradle via adding the appropiate dependenc
 
 ### Gradle
 
-The dependency is:
-
 ```groovy
  compile 'io.nlopez.clusterer:library:1.0.1'
 ```
 
-And the repository is:
-```groovy
-repositories {
-
-    mavenCentral()
-    // ... blah blah the rest of your repositories ...
-
-    maven { url 'http://maven.nlopez.io:8081/artifactory/repo' }
-}
-```
-
 ### Maven
-
-The dependency is:
 
 ```xml
 <dependency>
@@ -37,14 +22,6 @@ The dependency is:
 	<artifactId>library</artifactId>
 	<version>1.0.1</version>
 </dependency>
-```
-
-And you should use my repository in your pom.xml too:
-```xml
-<repository>
-    <id>nlopez-repository</id>
-    <url>http://maven.nlopez.io:8081/artifactory/repo</url>
-</repository>
 ```
 
 Preparing your app

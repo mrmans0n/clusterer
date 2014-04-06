@@ -1,0 +1,32 @@
+apply plugin: 'android'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion '19.0.2'
+
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion 19
+        versionCode 10000
+        versionName "1.0.0"
+    }
+    buildTypes {
+        release {
+            runProguard false
+        }
+    }
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':library')
+    compile 'com.google.android.gms:play-services:4.+'
+}

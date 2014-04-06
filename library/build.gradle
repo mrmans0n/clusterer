@@ -1,0 +1,119 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.9.+'
+    }
+}
+
+apply plugin: 'android-library'
+apply plugin: 'maven-publish'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+
+version '1.0.2-SNAPSHOT'
+group 'io.nlopez.clusterer'
+
+dependencies {
+    compile 'com.google.android.gms:play-services:4.+'
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.2"
+
+    buildTypes {
+        defaultConfig {
+            minSdkVersion 9
+            targetSdkVersion 19
+            versionCode 10001
+            versionName version
+        }
+    }
+}
+
+android.libraryVariants
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact "build/libs/Clusterer-${version}.aar"
+            artifactId 'library'
+        }
+    }
+}
+
+def isReleaseBuild() {
+    return version.contains("SNAPSHOT") == false
+}
+
+signing {
+    required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+}
+
+uploadArchives {
+    configuration = configurations.archives
+    repositories.mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+        repository(url: sonatypeRepo) {
+            authentication(userName: sonatypeUsername,
+                    password: sonatypePassword)
+        }
+        snapshotRepository(url: sonatypeSnapshotRepo) {
+            authentication(userName: sonatypeUsername,
+                    password: sonatypePassword)
+        }
+
+        pom.project {
+            name 'Clusterer'
+            packaging 'aar'
+            description 'Clustering library for points of interest in Android v2 Maps'
+            url 'https://github.com/mrmans0n/clusterer'
+            artifactId 'library'
+
+            scm {
+                url 'scm:git@github.com:mrmans0n/clusterer.git'
+                connection 'scm:git@github.com:mrmans0n/clusterer.git'
+                developerConnection 'scm:git@github.com:mrmans0n/clusterer.git'
+            }
+
+            licenses {
+                license {
+                    name 'MIT license'
+                    url 'http://www.opensource.org/licenses/mit-license.php'
+                    distribution 'repo'
+                }
+            }
+
+            developers {
+                developer {
+                    id 'mrmans0n'
+                    name 'Nacho Lopez'
+                    email 'nacho@nlopez.io'
+                }
+            }
+        }
+    }
+
+    task androidJavadocs(type: Javadoc) {
+        source = android.sourceSets.main.allJava
+    }
+
+    task androidJavadocsJar(type: Jar) {
+        classifier = 'javadoc'
+        from androidJavadocs.destinationDir
+    }
+
+    task androidSourcesJar(type: Jar) {
+        classifier = 'sources'
+        from android.sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives androidSourcesJar
+        archives androidJavadocsJar
+    }
+}

@@ -14,6 +14,7 @@ gen/
 
 # Local configuration file (sdk path, etc)
 local.properties
+gradle.properties
 
 # Eclipse project files
 .classpath
@@ -36,7 +37,10 @@ library/gen-external-apklibs/
 library/target/
 sample/gen-external-apklibs/
 sample/target/
+library/build/
+sample/build/
 out/
+.gradle/
 
 # Apple crap
 .DS_Store
