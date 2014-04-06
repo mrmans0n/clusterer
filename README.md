@@ -45,12 +45,12 @@ In the class you are using the GoogleMap object, you must instance the **Cluster
 
 ```java
 	GoogleMap map;
-	Clusterer clusterer;
+	Clusterer<MyPoi> clusterer;
 
 	// [...]
 
 	private void initClusterer() {
-		clustered = new Clusterer(this, map);
+		clustered = new Clusterer<MyPoi>(this, map);
 	}
 
 ```
@@ -83,13 +83,12 @@ Here you have an example that displays the value of an attribute called `descrip
 		clusterer.setOnPaintingMarkerListener(new OnPaintingClusterableMarkerListener() {
 
 			@Override
-			public void onMarkerCreated(Marker marker, Clusterable clusterable) {
+			public void onMarkerCreated(Marker marker, MyPoi clusterable) {
                 // If you want to perform some animation or whatever, you could do it here
 			}
 
 			@Override
-			public MarkerOptions onCreateMarkerOptions(Clusterable clusterable) {
-				PointOfInterest poi = (PointOfInterest) clusterable;
+			public MarkerOptions onCreateMarkerOptions(MyPoi poi) {
 				return new MarkerOptions().position(clusterable.getPosition()).title(poi.getName()).snippet(poi.getDescription());
 			}
 		});
