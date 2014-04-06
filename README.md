@@ -11,7 +11,7 @@ You can add the project with maven or gradle via adding the appropiate dependenc
 ### Gradle
 
 ```groovy
- compile 'io.nlopez.clusterer:library:1.0.1'
+ compile 'io.nlopez.clusterer:library:1.0.2'
 ```
 
 ### Maven
@@ -20,7 +20,7 @@ You can add the project with maven or gradle via adding the appropiate dependenc
 <dependency>
 	<groupId>io.nlopez.clusterer</groupId>
 	<artifactId>library</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 </dependency>
 ```
 
