@@ -8,20 +8,8 @@ Getting Started
 
 You can add the project with maven or gradle via adding the appropiate dependence.
 
-### Gradle
-
 ```groovy
  compile 'io.nlopez.clusterer:library:1.0.2'
-```
-
-### Maven
-
-```xml
-<dependency>
-	<groupId>io.nlopez.clusterer</groupId>
-	<artifactId>library</artifactId>
-	<version>1.0.2</version>
-</dependency>
 ```
 
 Preparing your app
