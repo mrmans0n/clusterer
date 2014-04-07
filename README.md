@@ -9,7 +9,7 @@ Getting Started
 You can add the project with maven or gradle via adding the appropiate dependence.
 
 ```groovy
- compile 'io.nlopez.clusterer:library:1.0.2'
+compile 'io.nlopez.clusterer:library:1.0.2'
 ```
 
 Preparing your app
