@@ -3,6 +3,7 @@ package io.nlopez.clusterer;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.view.animation.Interpolator;
@@ -23,6 +24,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -36,6 +39,8 @@ public class Clusterer<T extends Clusterable> {
     private static final QuadTreeBoundingBox WORLD = new QuadTreeBoundingBox(-85, -180, 85, 180);
     public static final int UPDATE_INTERVAL_TIME = 500;
     public static final int CAMERA_ANIMATION_DURATION = 500;
+
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private GoogleMap googleMap;
     private Context context;
@@ -163,7 +168,11 @@ public class Clusterer<T extends Clusterable> {
             task.cancel(false);
         }
         task = new UpdateMarkersTask(context, googleMap, onPaintingMarker, onPaintingCluster);
-        task.execute(pointsTree);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            task.executeOnExecutor(executor, pointsTree);
+        } else {
+            task.execute(pointsTree);
+        }
     }
 
     private class UpdateMarkersTask extends AsyncTask<QuadTree<T>, Void, ClusteringProcessResultHolder<T>> {
@@ -287,6 +296,7 @@ public class Clusterer<T extends Clusterable> {
 
             if (result == null) return;
 
+            // TODO I have to clean this mess eventually
             updatingLock.lock();
 
             // Remove all cluster marks (they will be regenerated)
