@@ -47,6 +47,7 @@ public class Clusterer<T extends Clusterable> {
     private QuadTree<T> pointsTree;
     private float oldZoomValue = 0f;
     private LatLng oldTargetValue;
+    private LatLngBounds oldBounds;
 
     private Interpolator animationInterpolator;
     private boolean animationEnabled = false;
@@ -88,7 +89,8 @@ public class Clusterer<T extends Clusterable> {
 
         @Override
         public void onCameraChange(CameraPosition cameraPosition) {
-            if (oldZoomValue != cameraPosition.zoom || oldTargetValue != cameraPosition.target) {
+            LatLngBounds mapBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
+            if (oldZoomValue != cameraPosition.zoom || oldBounds == null || !oldBounds.contains(mapBounds.northeast) || !oldBounds.contains(mapBounds.southwest)) {
                 oldZoomValue = cameraPosition.zoom;
                 oldTargetValue = cameraPosition.target;
 
@@ -188,7 +190,10 @@ public class Clusterer<T extends Clusterable> {
         UpdateMarkersTask(Context context, GoogleMap map, OnPaintingClusterableMarkerListener onPaintingClusterableMarker,
                           OnPaintingClusterListener onPaintingCluster) {
             this.map = new WeakReference<GoogleMap>(map);
-            this.bounds = map.getProjection().getVisibleRegion().latLngBounds;
+            LatLngBounds originalBounds = map.getProjection().getVisibleRegion().latLngBounds;
+            this.bounds = new LatLngBounds(
+                    new LatLng(originalBounds.southwest.latitude - 0.5, originalBounds.southwest.longitude + 0.5),
+                    new LatLng(originalBounds.northeast.latitude + 0.5, originalBounds.northeast.longitude - 0.5));
             this.zoomScale = map.getCameraPosition().zoom;
             this.gridInPixels = (int) (getSizeForZoomScale((int) zoomScale) * context.getResources().getDisplayMetrics().density + 0.5f);
             this.onPaintingCluster = onPaintingCluster;
@@ -393,6 +398,9 @@ public class Clusterer<T extends Clusterable> {
                     throw new RuntimeException("If animation is enabled, you should provide a MarkerAnimation");
                 }
             }
+
+            // Save bounds
+            oldBounds = bounds;
 
             updatingLock.unlock();
         }
