@@ -27,6 +27,7 @@ import java.util.Random;
 import io.nlopez.clusterer.Cluster;
 import io.nlopez.clusterer.Clusterable;
 import io.nlopez.clusterer.Clusterer;
+import io.nlopez.clusterer.MarkerAnimation;
 import io.nlopez.clusterer.sample.model.PointOfInterest;
 
 /**
@@ -91,6 +92,15 @@ public class MainActivity extends Activity {
     private void initClusterer() {
         clusterer = new Clusterer<PointOfInterest>(this, map);
         clusterer.addAll(pointsOfInterest);
+
+        clusterer.setAnimationEnabled(true);
+        clusterer.setMarkerAnimation(new MarkerAnimation() {
+            @Override
+            public void animateMarker(Marker marker, float interpolation) {
+                // Basic fading animation
+                marker.setAlpha(interpolation);
+            }
+        });
 
         clusterer.setOnPaintingMarkerListener(new Clusterer.OnPaintingClusterableMarkerListener() {
 

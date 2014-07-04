@@ -36,7 +36,6 @@ public class Clusterer<T extends Clusterable> {
     private static final QuadTreeBoundingBox WORLD = new QuadTreeBoundingBox(-85, -180, 85, 180);
     public static final int UPDATE_INTERVAL_TIME = 500;
     public static final int CAMERA_ANIMATION_DURATION = 500;
-    public static final int FADE_ANIMATION_DURATION = 400;
 
     private GoogleMap googleMap;
     private Context context;
@@ -44,10 +43,16 @@ public class Clusterer<T extends Clusterable> {
     private float oldZoomValue = 0f;
     private LatLng oldTargetValue;
 
+    private Interpolator animationInterpolator;
+    private boolean animationEnabled = false;
+    private int animationDuration = 500;
+    private MarkerAnimation markerAnimation;
+
     private OnPaintingClusterListener onPaintingCluster;
     private OnPaintingClusterableMarkerListener onPaintingMarker;
     private OnCameraChangeListener onCameraChangeListener;
     private HashMap<T, Marker> pointMarkers;
+    private HashMap<Marker, T> markersPoint;
     private HashMap<Marker, Cluster<T>> clusterMarkers;
     private List<Marker> allMarkers;
     private UpdateMarkersTask task;
@@ -61,10 +66,12 @@ public class Clusterer<T extends Clusterable> {
         this.googleMap.setOnCameraChangeListener(cameraChanged);
         this.googleMap.setOnMarkerClickListener(markerClicked);
         this.pointMarkers = new HashMap<T, Marker>();
+        this.markersPoint = new HashMap<Marker, T>();
         this.clusterMarkers = new HashMap<Marker, Cluster<T>>();
         this.allMarkers = new ArrayList<Marker>();
         this.refreshHandler = new Handler();
         this.updatingLock = new ReentrantLock();
+        this.animationInterpolator = new LinearInterpolator();
         initQuadTree();
     }
 
@@ -321,6 +328,7 @@ public class Clusterer<T extends Clusterable> {
             // Actually remove the non shown pois
             for (T poi : deleted) {
                 Marker marker = pointMarkers.remove(poi);
+                markersPoint.remove(marker);
                 allMarkers.remove(marker);
             }
 
@@ -363,18 +371,24 @@ public class Clusterer<T extends Clusterable> {
                     allMarkers.add(marker);
                     newlyAddedMarkers.add(marker);
                     pointMarkers.put(poi, marker);
+                    markersPoint.put(marker, poi);
                 }
             }
 
             // Animate the new additions
-            animateRecentlyAddedMarkers(newlyAddedMarkers);
+            if (animationEnabled) {
+                if (markerAnimation != null) {
+                    animateRecentlyAddedMarkers(newlyAddedMarkers, markerAnimation);
+                } else {
+                    throw new RuntimeException("If animation is enabled, you should provide a MarkerAnimation");
+                }
+            }
 
             updatingLock.unlock();
         }
     }
 
-    private void animateRecentlyAddedMarkers(final List<Marker> newlyAddedMarkers) {
-        final Interpolator interpolator = new LinearInterpolator();
+    private void animateRecentlyAddedMarkers(final List<Marker> newlyAddedMarkers, final MarkerAnimation animation) {
         final long start = SystemClock.uptimeMillis();
         final Handler handler = new Handler();
 
@@ -382,10 +396,10 @@ public class Clusterer<T extends Clusterable> {
             @Override
             public void run() {
                 long elapsed = SystemClock.uptimeMillis() - start;
-                float t = interpolator.getInterpolation((float) elapsed / FADE_ANIMATION_DURATION);
+                float t = animationInterpolator.getInterpolation((float) elapsed / animationDuration);
 
                 for (Marker marker : newlyAddedMarkers) {
-                    marker.setAlpha(t);
+                    animation.animateMarker(marker, t);
                 }
 
                 if (t < 1.0) {
@@ -394,6 +408,46 @@ public class Clusterer<T extends Clusterable> {
             }
         });
 
+    }
+
+    public T getClusterableFromMarker(Marker marker) {
+        return markersPoint.get(marker);
+    }
+
+    public Marker getMarkerFromClusterable(T clusterable) {
+        return pointMarkers.get(clusterable);
+    }
+
+    public Interpolator getAnimationInterpolator() {
+        return animationInterpolator;
+    }
+
+    public void setAnimationInterpolator(Interpolator animationInterpolator) {
+        this.animationInterpolator = animationInterpolator;
+    }
+
+    public boolean isAnimationEnabled() {
+        return animationEnabled;
+    }
+
+    public void setAnimationEnabled(boolean animationEnabled) {
+        this.animationEnabled = animationEnabled;
+    }
+
+    public int getAnimationDuration() {
+        return animationDuration;
+    }
+
+    public void setAnimationDuration(int animationDuration) {
+        this.animationDuration = animationDuration;
+    }
+
+    public MarkerAnimation getMarkerAnimation() {
+        return markerAnimation;
+    }
+
+    public void setMarkerAnimation(MarkerAnimation markerAnimation) {
+        this.markerAnimation = markerAnimation;
     }
 
     private class ClusteringProcessResultHolder<T extends Clusterable> {

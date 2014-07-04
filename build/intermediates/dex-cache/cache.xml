@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pre-dex-items>
+
+    <item
+        dex="/Users/mrm/Documents/workspace/clusterer/sample/build/intermediates/pre-dexed/debug/support-v4-19.0.1-cbedd3f4568c83fa4bf7c2c73a1d5d837414d9a1.jar"
+        jar="/Users/mrm/Documents/android-sdk/extras/android/m2repository/com/android/support/support-v4/19.0.1/support-v4-19.0.1.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="587da9a481ffd341d2fa091704489b89845ddacd"/>
+    <item
+        dex="/Users/mrm/Documents/workspace/clusterer/sample/build/intermediates/pre-dexed/debug/classes-b093a6c5775ff1eeeb8bebe5fb947b68eda91863.jar"
+        jar="/Users/mrm/Documents/workspace/clusterer/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="3dfdf1db5ce5ea2999a5dcde8c8e650b02660059"/>
+    <item
+        dex="/Users/mrm/Documents/workspace/clusterer/sample/build/intermediates/pre-dexed/debug/classes-8d129cbfc3447acadc0460972544cdc05fcbdcd6.jar"
+        jar="/Users/mrm/Documents/workspace/clusterer/build/intermediates/exploded-aar/io.nlopez.clusterer/library/1.0.3-SNAPSHOT/classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="b7413f5f01e015d06cf18f5b238977629eb4af8a"/>
+
+</pre-dex-items>
