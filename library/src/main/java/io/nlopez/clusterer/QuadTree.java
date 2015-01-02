@@ -20,7 +20,7 @@ public class QuadTree<T extends Clusterable> {
     }
 
     public boolean insertData(T data) {
-        return insertData(data);
+        return root.insertData(data);
     }
 
     public void insertData(List<T> data) {
