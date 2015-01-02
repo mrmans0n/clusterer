@@ -1,18 +1,18 @@
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion 21
+    buildToolsVersion '21.1.2'
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 19
+        targetSdkVersion 21
         versionCode 10000
         versionName "1.0.0"
     }
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
         }
     }
     signingConfigs {
@@ -28,5 +28,4 @@ repositories {
 
 dependencies {
     compile project(':library')
-    compile 'com.google.android.gms:play-services:4.+'
 }

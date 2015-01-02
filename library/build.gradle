@@ -3,31 +3,31 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.android.tools.build:gradle:1.0.0'
     }
 }
 
-apply plugin: 'android-library'
+apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
 
-version '1.0.3-SNAPSHOT'
+version '1.0.3'
 group 'io.nlopez.clusterer'
 
 dependencies {
-    compile 'com.google.android.gms:play-services:4.+'
+    compile 'com.google.android.gms:play-services-location:6.5.87'
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion 21
+    buildToolsVersion '21.1.2'
 
     buildTypes {
         defaultConfig {
             minSdkVersion 9
-            targetSdkVersion 19
+            targetSdkVersion 21
             versionCode 10001
             versionName version
         }
