@@ -4,10 +4,6 @@
     android:versionCode="1"
     android:versionName="1.0">
 
-    <uses-sdk
-        android:minSdkVersion="9"
-        android:targetSdkVersion="19" />
-
     <permission
         android:name="io.nlopez.clusterer.sample.MAPS_RECEIVE"
         android:protectionLevel="signature" />
