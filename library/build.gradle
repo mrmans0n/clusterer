@@ -1,13 +1,16 @@
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'org.robolectric:robolectric-gradle-plugin:0.14.1'
     }
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'robolectric'
 apply plugin: 'maven-publish'
 apply plugin: 'maven'
 apply plugin: 'signing'
@@ -17,7 +20,20 @@ version '1.0.4-SNAPSHOT'
 group 'io.nlopez.clusterer'
 
 dependencies {
+    repositories {
+        mavenCentral()
+    }
     compile 'com.google.android.gms:play-services-location:6.5.87'
+    androidTestCompile 'junit:junit:4.12'
+    androidTestCompile 'org.robolectric:robolectric:2.4'
+    androidTestCompile 'org.mockito:mockito-core:1.9.5'
+    androidTestCompile 'org.assertj:assertj-core:1.7.1'
+    androidTestCompile 'com.squareup.assertj:assertj-android:1.0.0'
+}
+
+robolectric {
+    include '**/*Test.class'
+    exclude '**/espresso/**/*.class'
 }
 
 android {
@@ -32,6 +48,7 @@ android {
             versionName version
         }
     }
+    sourceSets.androidTest.java.srcDirs += 'build/generated-sources'
 }
 
 android.libraryVariants
