@@ -13,23 +13,21 @@ public class Cluster<T extends Clusterable> implements Clusterable {
 
     private List<T> markers = new ArrayList<T>();
     private LatLng center;
-    private Double latitudeSum;
-    private Double longitudeSum;
+    private LatLngBounds bounds;
+    private LatLngBounds.Builder boundsBuilder;
 
     public Cluster(T marker) {
+        boundsBuilder = new LatLngBounds.Builder();
         addMarker(marker);
     }
 
     public void addMarker(T marker) {
         markers.add(marker);
+        bounds = boundsBuilder.include(marker.getPosition()).build();
         if (center == null) {
             center = marker.getPosition();
-            latitudeSum = center.latitude;
-            longitudeSum = center.longitude;
         } else {
-            latitudeSum += marker.getPosition().latitude;
-            longitudeSum += marker.getPosition().longitude;
-            center = new LatLng(latitudeSum / markers.size(), longitudeSum / markers.size());
+            center = bounds.getCenter();
         }
     }
 
@@ -38,11 +36,7 @@ public class Cluster<T extends Clusterable> implements Clusterable {
     }
 
     public LatLngBounds getBounds() {
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (T marker : markers) {
-            builder.include(marker.getPosition());
-        }
-        return builder.build();
+        return bounds;
     }
 
     public LatLng getCenter() {
@@ -69,20 +63,12 @@ public class Cluster<T extends Clusterable> implements Clusterable {
 
         Cluster cluster = (Cluster) o;
 
-        if (center != null ? !center.equals(cluster.center) : cluster.center != null) return false;
-        if (latitudeSum != null ? !latitudeSum.equals(cluster.latitudeSum) : cluster.latitudeSum != null)
-            return false;
-        if (longitudeSum != null ? !longitudeSum.equals(cluster.longitudeSum) : cluster.longitudeSum != null)
-            return false;
+        return !(center != null ? !center.equals(cluster.center) : cluster.center != null);
 
-        return true;
     }
 
     @Override
     public int hashCode() {
-        int result = center != null ? center.hashCode() : 0;
-        result = 31 * result + (latitudeSum != null ? latitudeSum.hashCode() : 0);
-        result = 31 * result + (longitudeSum != null ? longitudeSum.hashCode() : 0);
-        return result;
+        return center != null ? center.hashCode() : 0;
     }
 }

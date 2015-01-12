@@ -1,6 +1,6 @@
 Clusterer
 =========
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Clusterer-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1322)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Clusterer-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1322) [![Build Status](https://travis-ci.org/mrmans0n/clusterer.svg?branch=master)](https://travis-ci.org/mrmans0n/clusterer)
 
 Clustering library for points of interest in Android v2 Maps.
 
