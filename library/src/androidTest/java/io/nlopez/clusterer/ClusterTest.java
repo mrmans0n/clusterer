@@ -19,4 +19,12 @@ public class ClusterTest {
         Cluster<TestPoint> testPointCluster = new Cluster<>(POINT_MESTALLA);
         assertThat(testPointCluster.getPosition()).isEqualTo(POINT_MESTALLA.getPosition());
     }
+
+    @Test
+    public void test_cluster_two_points() {
+        Cluster<TestPoint> testPointCluster = new Cluster<>(POINT_MESTALLA);
+        testPointCluster.addMarker(POINT_CUENCA);
+
+        assertThat(testPointCluster.getMarkers()).contains(POINT_CUENCA, POINT_MESTALLA);
+    }
 }
