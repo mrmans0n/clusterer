@@ -1,6 +1,7 @@
 package io.nlopez.clusterer;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,20 @@ public class QuadTreeBoundingBoxTest {
     @Test
     public void test_quadtree_bounding_box_creation() {
         QuadTreeBoundingBox box = fromNESW(IBERIAN_NE, IBERIAN_SW);
+
+        assertThat(box.getMinX()).isEqualTo(IBERIAN_SW.latitude);
+        assertThat(box.getMinY()).isEqualTo(IBERIAN_SW.longitude);
+
+        assertThat(box.getMaxX()).isEqualTo(IBERIAN_NE.latitude);
+        assertThat(box.getMaxY()).isEqualTo(IBERIAN_NE.longitude);
+
+        assertThat(box.getMidX()).isEqualTo((IBERIAN_NE.latitude + IBERIAN_SW.latitude) / 2);
+        assertThat(box.getMidY()).isEqualTo((IBERIAN_NE.longitude + IBERIAN_SW.longitude) / 2);
+    }
+
+    @Test
+    public void test_quadtree_bounding_box_creation_latlngbounds() {
+        QuadTreeBoundingBox box = new QuadTreeBoundingBox(new LatLngBounds(IBERIAN_SW, IBERIAN_NE));
 
         assertThat(box.getMinX()).isEqualTo(IBERIAN_SW.latitude);
         assertThat(box.getMinY()).isEqualTo(IBERIAN_SW.longitude);

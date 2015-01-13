@@ -1,11 +1,17 @@
 package io.nlopez.clusterer;
 
+import com.google.android.gms.maps.model.LatLngBounds;
+
 /**
  * Created by Nacho L. on 04/11/13.
  */
 public class QuadTreeBoundingBox {
 
     private double minX, minY, maxX, maxY, midX, midY;
+
+    public QuadTreeBoundingBox(LatLngBounds bounds) {
+        this(bounds.southwest.latitude, bounds.northeast.longitude, bounds.northeast.latitude, bounds.southwest.longitude);
+    }
 
     public QuadTreeBoundingBox(double x1, double y1, double xf, double yf) {
         minX = Math.min(x1, xf);
