@@ -20,7 +20,7 @@ public class QuadTreeNode<T extends Clusterable> {
         this.capacity = capacity;
     }
 
-    void subdivide() {
+    public void subdivide() {
 
         QuadTreeBoundingBox box = getBoundingBox();
         double xMid = box.getMidX();
@@ -40,7 +40,7 @@ public class QuadTreeNode<T extends Clusterable> {
 
     }
 
-    boolean insertData(T data) {
+    public boolean insertData(T data) {
 
         if (!getBoundingBox().containsData(data)) {
             return false;
@@ -63,7 +63,7 @@ public class QuadTreeNode<T extends Clusterable> {
         return false;
     }
 
-    void processDataInRange(QuadTreeBoundingBox range, ArrayList<T> points) {
+    public void processDataInRange(QuadTreeBoundingBox range, ArrayList<T> points) {
         if (!boundingBox.isIntersecting(range)) {
             return;
         }
@@ -86,11 +86,11 @@ public class QuadTreeNode<T extends Clusterable> {
         southEast.processDataInRange(range, points);
     }
 
-    QuadTreeNode<T> getNorthWest() {
+    public QuadTreeNode<T> getNorthWest() {
         return northWest;
     }
 
-    void setNorthWest(QuadTreeNode<T> northWest) {
+    public void setNorthWest(QuadTreeNode<T> northWest) {
         this.northWest = northWest;
     }
 
@@ -98,7 +98,7 @@ public class QuadTreeNode<T extends Clusterable> {
         return northEast;
     }
 
-    void setNorthEast(QuadTreeNode<T> northEast) {
+    public void setNorthEast(QuadTreeNode<T> northEast) {
         this.northEast = northEast;
     }
 
@@ -106,7 +106,7 @@ public class QuadTreeNode<T extends Clusterable> {
         return southWest;
     }
 
-    void setSouthWest(QuadTreeNode<T> southWest) {
+    public void setSouthWest(QuadTreeNode<T> southWest) {
         this.southWest = southWest;
     }
 
@@ -114,7 +114,7 @@ public class QuadTreeNode<T extends Clusterable> {
         return southEast;
     }
 
-    void setSouthEast(QuadTreeNode<T> southEast) {
+    public void setSouthEast(QuadTreeNode<T> southEast) {
         this.southEast = southEast;
     }
 
