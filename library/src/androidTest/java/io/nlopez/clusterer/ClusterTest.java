@@ -6,6 +6,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import io.nlopez.clusterer.utils.CustomTestRunner;
+import io.nlopez.clusterer.utils.TestPoint;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -33,7 +36,7 @@ public class ClusterTest {
 
         assertThat(testPointCluster.getPosition()).isEqualTo(POINT_MESTALLA.getPosition());
         assertThat(testPointCluster.getCenter()).isEqualTo(POINT_MESTALLA.getPosition());
-        assertThat(testPointCluster.isCluster()).isEqualTo(false);
+        assertThat(testPointCluster.isCluster()).isFalse();
         assertThat(testPointCluster.getWeight()).isEqualTo(1);
         assertThat(testPointCluster.getBounds()).isEqualTo(new LatLngBounds.Builder().include(POINT_MESTALLA.getPosition()).build());
 
@@ -48,7 +51,7 @@ public class ClusterTest {
         assertThat(testPointCluster.getCenter()).isEqualTo(boundsForTwo.getCenter());
         assertThat(testPointCluster.getPosition()).isEqualTo(boundsForTwo.getCenter());
         assertThat(testPointCluster.getBounds()).isEqualTo(boundsForTwo);
-        assertThat(testPointCluster.isCluster()).isEqualTo(true);
+        assertThat(testPointCluster.isCluster()).isTrue();
         assertThat(testPointCluster.getWeight()).isEqualTo(2);
     }
 
@@ -62,7 +65,7 @@ public class ClusterTest {
         assertThat(testPointCluster.getCenter()).isEqualTo(boundsForThree.getCenter());
         assertThat(testPointCluster.getPosition()).isEqualTo(boundsForThree.getCenter());
         assertThat(testPointCluster.getBounds()).isEqualTo(boundsForThree);
-        assertThat(testPointCluster.isCluster()).isEqualTo(true);
+        assertThat(testPointCluster.isCluster()).isTrue();
         assertThat(testPointCluster.getWeight()).isEqualTo(3);
     }
 }

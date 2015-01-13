@@ -5,29 +5,40 @@ package io.nlopez.clusterer;
  */
 public class QuadTreeBoundingBox {
 
-    private double x1, y1, xf, yf;
+    private double minX, minY, maxX, maxY, midX, midY;
 
     public QuadTreeBoundingBox(double x1, double y1, double xf, double yf) {
-        this.x1 = x1;
-        this.y1 = y1;
-        this.xf = xf;
-        this.yf = yf;
+        minX = Math.min(x1, xf);
+        minY = Math.min(y1, yf);
+        maxX = Math.max(x1, xf);
+        maxY = Math.max(y1, yf);
+
+        midX = (minX + maxX) / 2;
+        midY = (minY + maxY) / 2;
     }
 
-    public double getX1() {
-        return x1;
+    public double getMinX() {
+        return minX;
     }
 
-    public double getY1() {
-        return y1;
+    public double getMinY() {
+        return minY;
     }
 
-    public double getXf() {
-        return xf;
+    public double getMaxX() {
+        return maxX;
     }
 
-    public double getYf() {
-        return yf;
+    public double getMaxY() {
+        return maxY;
+    }
+
+    public double getMidX() {
+        return midX;
+    }
+
+    public double getMidY() {
+        return midY;
     }
 
     public boolean containsData(Clusterable data) {
@@ -35,17 +46,11 @@ public class QuadTreeBoundingBox {
     }
 
     public boolean isIntersecting(QuadTreeBoundingBox other) {
-        return this.x1 <= other.getXf() && this.xf >= other.getX1() && this.y1 <= other.getYf() && this.yf >= other.getY1();
+        return minX < other.getMaxX() && maxX > other.getMinX() && minY < other.getMaxY() && maxY > other.getMinY();
     }
 
     private boolean containsPoint(double x, double y) {
-        boolean containsX = isBetween(this.x1, this.xf, x);
-        boolean containsY = isBetween(this.y1, this.yf, y);
-        return containsX && containsY;
-    }
-
-    private static boolean isBetween(double a, double b, double c) {
-        return b > a ? c > a && c < b : c > b && c < a;
+        return minX <= x && maxX >= x && minY <= y && maxY >= y;
     }
 
 }

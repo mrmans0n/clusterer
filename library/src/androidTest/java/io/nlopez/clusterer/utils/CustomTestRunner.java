@@ -1,4 +1,4 @@
-package io.nlopez.clusterer;
+package io.nlopez.clusterer.utils;
 
 import org.robolectric.AndroidManifest;
 import org.robolectric.RobolectricTestRunner;

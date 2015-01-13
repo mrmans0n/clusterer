@@ -6,7 +6,6 @@ import java.util.ArrayList;
  * Created by Nacho L. on 04/11/13.
  */
 public class QuadTreeNode<T extends Clusterable> {
-    private static int counter = 0;
     private QuadTreeNode<T> northWest;
     private QuadTreeNode<T> northEast;
     private QuadTreeNode<T> southWest;
@@ -24,19 +23,19 @@ public class QuadTreeNode<T extends Clusterable> {
     public void subdivide() {
 
         QuadTreeBoundingBox box = getBoundingBox();
-        double xMid = (box.getXf() + box.getX1()) / 2.0;
-        double yMid = (box.getYf() + box.getY1()) / 2.0;
+        double xMid = box.getMidX();
+        double yMid = box.getMidY();
 
-        QuadTreeBoundingBox northWest = new QuadTreeBoundingBox(box.getX1(), box.getY1(), xMid, yMid);
+        QuadTreeBoundingBox northWest = new QuadTreeBoundingBox(box.getMinX(), box.getMinY(), xMid, yMid);
         setNorthWest(new QuadTreeNode<T>(northWest, capacity));
 
-        QuadTreeBoundingBox northEast = new QuadTreeBoundingBox(xMid, box.getY1(), box.getXf(), yMid);
+        QuadTreeBoundingBox northEast = new QuadTreeBoundingBox(xMid, box.getMinY(), box.getMaxX(), yMid);
         setNorthEast(new QuadTreeNode<T>(northEast, capacity));
 
-        QuadTreeBoundingBox southWest = new QuadTreeBoundingBox(box.getX1(), yMid, xMid, box.getYf());
+        QuadTreeBoundingBox southWest = new QuadTreeBoundingBox(box.getMinX(), yMid, xMid, box.getMaxY());
         setSouthWest(new QuadTreeNode<T>(southWest, capacity));
 
-        QuadTreeBoundingBox southEast = new QuadTreeBoundingBox(xMid, yMid, box.getXf(), box.getYf());
+        QuadTreeBoundingBox southEast = new QuadTreeBoundingBox(xMid, yMid, box.getMaxX(), box.getMaxY());
         setSouthEast(new QuadTreeNode<T>(southEast, capacity));
 
     }

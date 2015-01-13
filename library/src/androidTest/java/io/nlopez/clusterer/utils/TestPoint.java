@@ -1,6 +1,8 @@
-package io.nlopez.clusterer;
+package io.nlopez.clusterer.utils;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import io.nlopez.clusterer.Clusterable;
 
 /**
  * Created by mrm on 12/1/15.
