@@ -50,6 +50,10 @@ public class QuadTreeBoundingBoxTest {
         assertThat(box.containsData(POINT_CUENCA)).isTrue();
         assertThat(box.containsData(POINT_MESTALLA)).isTrue();
         assertThat(box.containsData(POINT_SEVASTOPOL)).isFalse();
+
+        assertThat(WORLD_BOX.containsData(POINT_CUENCA)).isTrue();
+        assertThat(WORLD_BOX.containsData(POINT_MESTALLA)).isTrue();
+        assertThat(WORLD_BOX.containsData(POINT_SEVASTOPOL)).isTrue();
     }
 
     @Test
@@ -66,6 +70,10 @@ public class QuadTreeBoundingBoxTest {
 
         assertThat(spainBox.isIntersecting(franceBox)).isTrue();
         assertThat(franceBox.isIntersecting(spainBox)).isTrue();
+
+        assertThat(WORLD_BOX.isIntersecting(spainBox)).isTrue();
+        assertThat(WORLD_BOX.isIntersecting(portugalBox)).isTrue();
+        assertThat(WORLD_BOX.isIntersecting(franceBox)).isTrue();
     }
 
     private QuadTreeBoundingBox fromNESW(LatLng northEast, LatLng southWest) {

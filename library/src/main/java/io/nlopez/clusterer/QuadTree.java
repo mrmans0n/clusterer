@@ -9,7 +9,12 @@ import java.util.List;
  */
 public class QuadTree<T extends Clusterable> {
 
+    private static final int MAX_CAPACITY = 60;
     QuadTreeNode<T> root;
+
+    public QuadTree(QuadTreeBoundingBox boundingBox) {
+        this(boundingBox, MAX_CAPACITY);
+    }
 
     public QuadTree(QuadTreeBoundingBox boundingBox, int capacity) {
         root = new QuadTreeNode<T>(boundingBox, capacity);
@@ -29,8 +34,10 @@ public class QuadTree<T extends Clusterable> {
         }
     }
 
-    public void getPointsInRange(QuadTreeBoundingBox boundingBox, ArrayList<T> points) {
+    public ArrayList<T> getPointsInRange(QuadTreeBoundingBox boundingBox) {
+        ArrayList<T> points = new ArrayList<T>();
         root.processDataInRange(boundingBox, points);
+        return points;
     }
 
     public void traverseNodes(OnNodeVisitedListener<T> listener) {

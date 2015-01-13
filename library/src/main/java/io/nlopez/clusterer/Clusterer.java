@@ -34,7 +34,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Clusterer<T extends Clusterable> {
 
-    private static final int NODE_CAPACITY = 10;
+    private static final int NODE_CAPACITY = 60;
     private static final int CLUSTER_CENTER_PADDING = 120;
     private static final QuadTreeBoundingBox WORLD = new QuadTreeBoundingBox(-85, -180, 85, 180);
     public static final int UPDATE_INTERVAL_TIME = 500;
@@ -240,8 +240,7 @@ public class Clusterer<T extends Clusterable> {
             double yf = Math.max(bounds.northeast.longitude, bounds.southwest.longitude);
 
             QuadTreeBoundingBox boundingBox = new QuadTreeBoundingBox(x1, y1, xf, yf);
-            ArrayList<T> pointsInRegion = new ArrayList<T>();
-            tree.getPointsInRange(boundingBox, pointsInRegion);
+            ArrayList<T> pointsInRegion = tree.getPointsInRange(boundingBox);
 
             // We got here the points we want to show show
             result.pois.addAll(pointsInRegion);
