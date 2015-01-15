@@ -49,7 +49,13 @@ android {
         }
     }
     sourceSets.androidTest.java.srcDirs += 'build/generated-sources'
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_6
+        targetCompatibility JavaVersion.VERSION_1_6
+    }
 }
+
 
 android.libraryVariants
 publishing {
