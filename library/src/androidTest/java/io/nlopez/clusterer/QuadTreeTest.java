@@ -68,7 +68,7 @@ public class QuadTreeTest {
         QuadTree<TestPoint> quadTree = new QuadTree<>(WORLD_BOX);
         quadTree.insertData(Arrays.asList(POINT_MESTALLA, POINT_CUENCA, POINT_SEVASTOPOL));
         quadTree.traverseNodes(visitNode);
-        verify(visitNode, atLeastOnce()).onNodeVisited(any(QuadTreeNode.class));
+        verify(visitNode, atLeastOnce()).onNodeVisited(any(QuadTree.QuadTreeNode.class));
     }
 
 }
