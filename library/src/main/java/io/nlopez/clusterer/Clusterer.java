@@ -57,10 +57,8 @@ public class Clusterer<T extends Clusterable> {
     private OnPaintingClusterListener onPaintingCluster;
     private OnPaintingClusterableMarkerListener onPaintingMarker;
     private OnCameraChangeListener onCameraChangeListener;
-    private HashMap<T, Marker> pointMarkers;
-    private HashMap<Marker, T> markersPoint;
+    private ReversibleHashMap<T, Marker> markers;
     private HashMap<Marker, Cluster<T>> clusterMarkers;
-    private List<Marker> allMarkers;
     private UpdateMarkersTask task;
     private final Lock updatingLock;
     private final Handler refreshHandler;
@@ -71,10 +69,8 @@ public class Clusterer<T extends Clusterable> {
         this.context = context;
         this.googleMap.setOnCameraChangeListener(cameraChanged);
         this.googleMap.setOnMarkerClickListener(markerClicked);
-        this.pointMarkers = new HashMap<T, Marker>();
-        this.markersPoint = new HashMap<Marker, T>();
-        this.clusterMarkers = new HashMap<Marker, Cluster<T>>();
-        this.allMarkers = new ArrayList<Marker>();
+        this.markers = new ReversibleHashMap<>();
+        this.clusterMarkers = new HashMap<>();
         this.refreshHandler = new Handler();
         this.updatingLock = new ReentrantLock();
         this.animationInterpolator = new LinearInterpolator();
@@ -230,8 +226,8 @@ public class Clusterer<T extends Clusterable> {
             QuadTree<T> tree = params[0];
 
             // Store old points
-            List<T> pointsToKeep = new ArrayList<T>(pointMarkers.keySet());
-            List<T> pointsToDelete = new ArrayList<T>(pointMarkers.keySet());
+            List<T> pointsToKeep = new ArrayList<T>(markers.keySet());
+            List<T> pointsToDelete = new ArrayList<T>(markers.keySet());
 
             // Get x1,y1,xf,yf from bounds
             double x1 = Math.min(bounds.southwest.latitude, bounds.northeast.latitude);
@@ -321,7 +317,7 @@ public class Clusterer<T extends Clusterable> {
             // Mark for deletion all the pois that wont be shown in the map
             List<T> deleted = new ArrayList<T>();
             for (T poi : result.poisToDelete) {
-                Marker marker = pointMarkers.get(poi);
+                Marker marker = markers.get(poi);
                 if (marker != null) {
                     marker.remove();
                 }
@@ -329,9 +325,9 @@ public class Clusterer<T extends Clusterable> {
             }
 
             // Fixes for possible errors
-            for (T poi : pointMarkers.keySet()) {
+            for (T poi : markers.keySet()) {
                 if (!result.pois.contains(poi)) {
-                    Marker marker = pointMarkers.get(poi);
+                    Marker marker = markers.get(poi);
                     if (marker != null) {
                         marker.remove();
                     }
@@ -341,9 +337,7 @@ public class Clusterer<T extends Clusterable> {
 
             // Actually remove the non shown pois
             for (T poi : deleted) {
-                Marker marker = pointMarkers.remove(poi);
-                markersPoint.remove(marker);
-                allMarkers.remove(marker);
+                Marker marker = markers.remove(poi);
             }
 
             // Retrieve the map from the weak reference to operate with it
@@ -366,7 +360,6 @@ public class Clusterer<T extends Clusterable> {
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                     }
 
-                    allMarkers.add(marker);
                     newlyAddedMarkers.add(marker);
                     clusterMarkers.put(marker, cluster);
                 }
@@ -374,7 +367,7 @@ public class Clusterer<T extends Clusterable> {
 
             // Generate all the pois
             for (T poi : result.pois) {
-                if (!pointMarkers.containsKey(poi)) {
+                if (!markers.containsKey(poi)) {
                     Marker marker;
                     if (onPaintingClusterableMarker != null) {
                         marker = strongMap.addMarker(onPaintingClusterableMarker.onCreateMarkerOptions(poi));
@@ -382,10 +375,8 @@ public class Clusterer<T extends Clusterable> {
                     } else {
                         marker = strongMap.addMarker(new MarkerOptions().position(poi.getPosition()));
                     }
-                    allMarkers.add(marker);
                     newlyAddedMarkers.add(marker);
-                    pointMarkers.put(poi, marker);
-                    markersPoint.put(marker, poi);
+                    markers.put(poi, marker);
                 }
             }
 
@@ -428,11 +419,11 @@ public class Clusterer<T extends Clusterable> {
     }
 
     public T getClusterableFromMarker(Marker marker) {
-        return markersPoint.get(marker);
+        return markers.getKey(marker);
     }
 
     public Marker getMarkerFromClusterable(T clusterable) {
-        return pointMarkers.get(clusterable);
+        return markers.get(clusterable);
     }
 
     public Interpolator getAnimationInterpolator() {
