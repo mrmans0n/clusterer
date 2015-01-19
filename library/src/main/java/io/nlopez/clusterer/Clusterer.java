@@ -46,7 +46,6 @@ public class Clusterer<T extends Clusterable> {
     private Context context;
     private QuadTree<T> pointsTree;
     private float oldZoomValue = 0f;
-    private LatLng oldTargetValue;
     private LatLngBounds oldBounds;
 
     private Interpolator animationInterpolator;
@@ -78,7 +77,7 @@ public class Clusterer<T extends Clusterable> {
     }
 
     private void initQuadTree() {
-        this.pointsTree = new QuadTree<T>(WORLD, NODE_CAPACITY);
+        this.pointsTree = new QuadTree<>(WORLD, NODE_CAPACITY);
     }
 
     GoogleMap.OnCameraChangeListener cameraChanged = new GoogleMap.OnCameraChangeListener() {
@@ -88,7 +87,6 @@ public class Clusterer<T extends Clusterable> {
             LatLngBounds mapBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
             if (oldZoomValue != cameraPosition.zoom || oldBounds == null || !oldBounds.contains(mapBounds.northeast) || !oldBounds.contains(mapBounds.southwest)) {
                 oldZoomValue = cameraPosition.zoom;
-                oldTargetValue = cameraPosition.target;
 
                 refreshHandler.removeCallbacks(updateMarkersRunnable);
                 refreshHandler.postDelayed(updateMarkersRunnable, UPDATE_INTERVAL_TIME);
@@ -185,7 +183,7 @@ public class Clusterer<T extends Clusterable> {
 
         UpdateMarkersTask(Context context, GoogleMap map, OnPaintingClusterableMarkerListener onPaintingClusterableMarker,
                           OnPaintingClusterListener onPaintingCluster) {
-            this.map = new WeakReference<GoogleMap>(map);
+            this.map = new WeakReference<>(map);
             LatLngBounds originalBounds = map.getProjection().getVisibleRegion().latLngBounds;
             this.bounds = new LatLngBounds(
                     new LatLng(originalBounds.southwest.latitude - 0.5, originalBounds.southwest.longitude + 0.5),
@@ -219,8 +217,9 @@ public class Clusterer<T extends Clusterable> {
                     && origin.y <= other.y + gridInPixels;
         }
 
+        @SafeVarargs
         @Override
-        protected ClusteringProcessResultHolder<T> doInBackground(QuadTree<T>... params) {
+        protected final ClusteringProcessResultHolder<T> doInBackground(QuadTree<T>... params) {
 
             ClusteringProcessResultHolder<T> result = new ClusteringProcessResultHolder<T>();
             QuadTree<T> tree = params[0];
@@ -459,9 +458,9 @@ public class Clusterer<T extends Clusterable> {
     }
 
     private class ClusteringProcessResultHolder<T extends Clusterable> {
-        public ArrayList<Cluster<T>> clusters = new ArrayList<Cluster<T>>();
-        public ArrayList<Cluster<T>> clustersToDelete = new ArrayList<Cluster<T>>();
-        public ArrayList<Cluster<T>> clustersToKeep = new ArrayList<Cluster<T>>();
+        public ArrayList<Cluster<T>> clusters = new ArrayList<>();
+        public ArrayList<Cluster<T>> clustersToDelete = new ArrayList<>();
+        public ArrayList<Cluster<T>> clustersToKeep = new ArrayList<>();
         public ArrayList<T> pois = new ArrayList<T>();
         public ArrayList<T> poisToDelete = new ArrayList<T>();
         public ArrayList<T> poisToKeep = new ArrayList<T>();
