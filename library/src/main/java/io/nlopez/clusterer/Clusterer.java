@@ -39,6 +39,7 @@ public class Clusterer<T extends Clusterable> {
     private static final QuadTreeBoundingBox WORLD = new QuadTreeBoundingBox(-85, -180, 85, 180);
     public static final int UPDATE_INTERVAL_TIME = 500;
     public static final int CAMERA_ANIMATION_DURATION = 500;
+    private static final float MAPS_V2_MAX_ZOOM_LEVEL = 21f;
 
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -180,6 +181,7 @@ public class Clusterer<T extends Clusterable> {
         private Projection projection;
         private int gridInPixels;
         private float zoomScale;
+        private boolean performCluster = true;
 
         UpdateMarkersTask(Context context, GoogleMap map, OnPaintingClusterableMarkerListener onPaintingClusterableMarker,
                           OnPaintingClusterListener onPaintingCluster) {
@@ -189,6 +191,7 @@ public class Clusterer<T extends Clusterable> {
                     new LatLng(originalBounds.southwest.latitude - 0.5, originalBounds.southwest.longitude + 0.5),
                     new LatLng(originalBounds.northeast.latitude + 0.5, originalBounds.northeast.longitude - 0.5));
             this.zoomScale = map.getCameraPosition().zoom;
+            this.performCluster = zoomScale < MAPS_V2_MAX_ZOOM_LEVEL;
             this.gridInPixels = (int) (getSizeForZoomScale((int) zoomScale) * context.getResources().getDisplayMetrics().density + 0.5f);
             this.onPaintingCluster = onPaintingCluster;
             this.onPaintingClusterableMarker = onPaintingClusterableMarker;
@@ -237,7 +240,7 @@ public class Clusterer<T extends Clusterable> {
             QuadTreeBoundingBox boundingBox = new QuadTreeBoundingBox(x1, y1, xf, yf);
             ArrayList<T> pointsInRegion = tree.getPointsInRange(boundingBox);
 
-            // We got here the points we want to show show
+            // We got here the points we want to show
             result.pois.addAll(pointsInRegion);
 
             // Intersect the new points with the old points = get the points NOT TO delete
