@@ -2,6 +2,7 @@ package io.nlopez.clusterer;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.annotation.Config;
 
 import java.util.HashMap;
 
@@ -13,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by mrm on 20/1/15.
  */
 @RunWith(CustomTestRunner.class)
+@Config(manifest = Config.NONE)
 public class ReversibleHashMapTest {
 
     @Test

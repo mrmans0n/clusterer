@@ -5,6 +5,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.annotation.Config;
 
 import io.nlopez.clusterer.utils.CustomTestRunner;
 import io.nlopez.clusterer.utils.TestPoint;
@@ -15,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by mrm on 12/1/15.
  */
 @RunWith(CustomTestRunner.class)
+@Config(manifest = Config.NONE)
 public class QuadTreeBoundingBoxTest {
     private static final TestPoint POINT_MESTALLA = new TestPoint(39.474531, -0.358065);
     private static final TestPoint POINT_CUENCA = new TestPoint(40.070392, -2.137416);

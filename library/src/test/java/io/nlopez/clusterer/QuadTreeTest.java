@@ -3,6 +3,7 @@ package io.nlopez.clusterer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.verify;
  * Created by mrm on 12/1/15.
  */
 @RunWith(CustomTestRunner.class)
+@Config(manifest = Config.NONE)
 public class QuadTreeTest {
     private static final QuadTreeBoundingBox WORLD_BOX = new QuadTreeBoundingBox(85, 180, -85, -180);
     private static final QuadTreeBoundingBox SPAIN_BOX = new QuadTreeBoundingBox(35.924644, 3.999023, 43.580390, -10.458984);
