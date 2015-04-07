@@ -25,9 +25,10 @@ import java.util.List;
 import java.util.Random;
 
 import io.nlopez.clusterer.Cluster;
-import io.nlopez.clusterer.Clusterable;
 import io.nlopez.clusterer.Clusterer;
 import io.nlopez.clusterer.MarkerAnimation;
+import io.nlopez.clusterer.OnPaintingClusterListener;
+import io.nlopez.clusterer.OnPaintingClusterableMarkerListener;
 import io.nlopez.clusterer.sample.model.PointOfInterest;
 
 /**
@@ -102,29 +103,28 @@ public class MainActivity extends Activity {
             }
         });
 
-        clusterer.setOnPaintingMarkerListener(new Clusterer.OnPaintingClusterableMarkerListener() {
+        clusterer.setOnPaintingMarkerListener(new OnPaintingClusterableMarkerListener<PointOfInterest>() {
 
             @Override
-            public void onMarkerCreated(Marker marker, Clusterable clusterable) {
+            public void onMarkerCreated(Marker marker, PointOfInterest clusterable) {
 
             }
 
             @Override
-            public MarkerOptions onCreateMarkerOptions(Clusterable clusterable) {
-                PointOfInterest poi = (PointOfInterest) clusterable;
-                return new MarkerOptions().position(clusterable.getPosition()).title(poi.getName()).snippet(poi.getDescription());
+            public MarkerOptions onCreateMarkerOptions(PointOfInterest poi) {
+                return new MarkerOptions().position(poi.getPosition()).title(poi.getName()).snippet(poi.getDescription());
             }
         });
 
-        clusterer.setOnPaintingClusterListener(new Clusterer.OnPaintingClusterListener() {
+        clusterer.setOnPaintingClusterListener(new OnPaintingClusterListener<PointOfInterest>() {
 
             @Override
-            public void onMarkerCreated(Marker marker, Cluster cluster) {
+            public void onMarkerCreated(Marker marker, Cluster<PointOfInterest> cluster) {
 
             }
 
             @Override
-            public MarkerOptions onCreateClusterMarkerOptions(Cluster cluster) {
+            public MarkerOptions onCreateClusterMarkerOptions(Cluster<PointOfInterest> cluster) {
                 return new MarkerOptions()
                         .title("Clustering " + cluster.getWeight() + " items")
                         .position(cluster.getCenter())

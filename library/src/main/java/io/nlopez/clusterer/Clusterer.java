@@ -469,18 +469,6 @@ public class Clusterer<T extends Clusterable> {
         public ArrayList<T> poisToKeep = new ArrayList<T>();
     }
 
-    public interface OnPaintingClusterableMarkerListener {
-        MarkerOptions onCreateMarkerOptions(Clusterable clusterable);
-
-        void onMarkerCreated(Marker marker, Clusterable clusterable);
-    }
-
-    public interface OnPaintingClusterListener {
-        MarkerOptions onCreateClusterMarkerOptions(Cluster cluster);
-
-        void onMarkerCreated(Marker marker, Cluster cluster);
-    }
-
     public interface OnCameraChangeListener {
         void onCameraChange(CameraPosition position);
     }
