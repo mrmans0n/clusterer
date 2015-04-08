@@ -62,6 +62,7 @@ public class Clusterer<T extends Clusterable> {
     private UpdateMarkersTask task;
     private final Lock updatingLock;
     private final Handler refreshHandler;
+    private float maxZoomScale = MAPS_V2_MAX_ZOOM_LEVEL;
 
 
     public Clusterer(Context context, GoogleMap googleMap) {
@@ -159,6 +160,14 @@ public class Clusterer<T extends Clusterable> {
         this.onCameraChangeListener = onCameraChangeListener;
     }
 
+    public float getMaxZoomScale() {
+        return maxZoomScale;
+    }
+
+    public void setMaxZoomScale(float maxZoomScale) {
+        this.maxZoomScale = maxZoomScale;
+    }
+
     @SuppressWarnings("unchecked")
     protected void updateMarkers() {
         if (task != null) {
@@ -191,7 +200,7 @@ public class Clusterer<T extends Clusterable> {
                     new LatLng(originalBounds.southwest.latitude - 0.5, originalBounds.southwest.longitude + 0.5),
                     new LatLng(originalBounds.northeast.latitude + 0.5, originalBounds.northeast.longitude - 0.5));
             this.zoomScale = map.getCameraPosition().zoom;
-            this.performCluster = zoomScale < MAPS_V2_MAX_ZOOM_LEVEL;
+            this.performCluster = zoomScale < maxZoomScale;
             this.gridInPixels = (int) (getSizeForZoomScale((int) zoomScale) * context.getResources().getDisplayMetrics().density + 0.5f);
             this.onPaintingCluster = onPaintingCluster;
             this.onPaintingClusterableMarker = onPaintingClusterableMarker;
@@ -254,16 +263,16 @@ public class Clusterer<T extends Clusterable> {
             for (T point : pointsInRegion) {
                 Point position = projection.toScreenLocation(point.getPosition());
                 boolean addedToCluster = false;
+                if (performCluster) {
+                    for (Point storedPoint : positions.keySet()) {
 
-                for (Point storedPoint : positions.keySet()) {
-
-                    if (isInDistance(position, storedPoint)) {
-                        positions.get(storedPoint).addMarker(point);
-                        addedToCluster = true;
-                        break;
+                        if (isInDistance(position, storedPoint)) {
+                            positions.get(storedPoint).addMarker(point);
+                            addedToCluster = true;
+                            break;
+                        }
                     }
                 }
-
                 if (!addedToCluster) {
                     positions.put(position, new Cluster<T>(point));
                 }
