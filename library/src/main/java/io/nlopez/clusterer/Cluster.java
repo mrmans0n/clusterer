@@ -14,15 +14,21 @@ public class Cluster<T extends Clusterable> implements Clusterable {
     private Set<T> markers = new HashSet<T>();
     private LatLng center;
     private LatLngBounds bounds;
-    private boolean needsRecalculationOfBounds = false;
+    private LatLngBounds.Builder boundsBuilder;
 
     public Cluster(T marker) {
+        boundsBuilder = new LatLngBounds.Builder();
         addMarker(marker);
     }
 
     public void addMarker(T marker) {
         markers.add(marker);
-        needsRecalculationOfBounds = true;
+        bounds = boundsBuilder.include(marker.getPosition()).build();
+        if (center == null) {
+            center = marker.getPosition();
+        } else {
+            center = bounds.getCenter();
+        }
     }
 
     public Set<T> getMarkers() {
@@ -30,30 +36,15 @@ public class Cluster<T extends Clusterable> implements Clusterable {
     }
 
     public LatLngBounds getBounds() {
-        computeBounds();
         return bounds;
     }
 
     public LatLng getCenter() {
-        computeBounds();
         return center;
     }
 
     public boolean isCluster() {
         return getWeight() > 1;
-    }
-
-    private void computeBounds() {
-        if (needsRecalculationOfBounds) {
-            LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
-
-            for (T marker : markers) {
-                boundsBuilder.include(marker.getPosition());
-            }
-            bounds = boundsBuilder.build();
-            center = bounds.getCenter();
-            needsRecalculationOfBounds = false;
-        }
     }
 
     public int getWeight() {
