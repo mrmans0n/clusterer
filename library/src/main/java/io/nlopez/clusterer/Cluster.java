@@ -3,48 +3,52 @@ package io.nlopez.clusterer;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Nacho Lopez on 28/10/13.
  */
 public class Cluster<T extends Clusterable> implements Clusterable {
 
-    private List<T> markers = new ArrayList<T>();
+    private Set<T> markers = new HashSet<T>();
     private LatLng center;
     private LatLngBounds bounds;
-    private LatLngBounds.Builder boundsBuilder;
 
     public Cluster(T marker) {
-        boundsBuilder = new LatLngBounds.Builder();
         addMarker(marker);
     }
 
     public void addMarker(T marker) {
         markers.add(marker);
-        bounds = boundsBuilder.include(marker.getPosition()).build();
-        if (center == null) {
-            center = marker.getPosition();
-        } else {
-            center = bounds.getCenter();
-        }
     }
 
-    public List<T> getMarkers() {
+    public Set<T> getMarkers() {
         return markers;
     }
 
     public LatLngBounds getBounds() {
+        computeBounds();
         return bounds;
     }
 
     public LatLng getCenter() {
+        computeBounds();
         return center;
     }
 
     public boolean isCluster() {
         return getWeight() > 1;
+    }
+
+    private void computeBounds() {
+        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+
+        for (T marker : markers) {
+            boundsBuilder.include(marker.getPosition());
+        }
+        bounds = boundsBuilder.build();
+        center = bounds.getCenter();
     }
 
     public int getWeight() {
