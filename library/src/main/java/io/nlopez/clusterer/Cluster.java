@@ -14,6 +14,7 @@ public class Cluster<T extends Clusterable> implements Clusterable {
     private Set<T> markers = new HashSet<T>();
     private LatLng center;
     private LatLngBounds bounds;
+    private boolean needsRecalculationOfBounds = false;
 
     public Cluster(T marker) {
         addMarker(marker);
@@ -21,6 +22,7 @@ public class Cluster<T extends Clusterable> implements Clusterable {
 
     public void addMarker(T marker) {
         markers.add(marker);
+        needsRecalculationOfBounds = true;
     }
 
     public Set<T> getMarkers() {
@@ -42,13 +44,16 @@ public class Cluster<T extends Clusterable> implements Clusterable {
     }
 
     private void computeBounds() {
-        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+        if (needsRecalculationOfBounds) {
+            LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 
-        for (T marker : markers) {
-            boundsBuilder.include(marker.getPosition());
+            for (T marker : markers) {
+                boundsBuilder.include(marker.getPosition());
+            }
+            bounds = boundsBuilder.build();
+            center = bounds.getCenter();
+            needsRecalculationOfBounds = false;
         }
-        bounds = boundsBuilder.build();
-        center = bounds.getCenter();
     }
 
     public int getWeight() {
