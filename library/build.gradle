@@ -16,7 +16,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 
-version '1.0.5-SNAPSHOT'
+version '1.0.5'
 group 'io.nlopez.clusterer'
 
 dependencies {
@@ -35,17 +35,16 @@ dependencies {
 
 robolectric {
     include '**/*Test.class'
-    exclude '**/espresso/**/*.class'
 }
 
 android {
-    compileSdkVersion 21
+    compileSdkVersion 22
     buildToolsVersion '21.1.2'
 
     buildTypes {
         defaultConfig {
             minSdkVersion 9
-            targetSdkVersion 21
+            targetSdkVersion 22
             versionCode 10001
             versionName version
         }
