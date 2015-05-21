@@ -107,6 +107,16 @@ public class Clusterer<T extends Clusterable> {
         }
     };
 
+    private Listener listener;
+
+    public Listener getListener() {
+        return listener;
+    }
+
+    public void setClustererListener(Listener listener) {
+        this.listener = listener;
+    }
+
     GoogleMap.OnMarkerClickListener markerClicked = new GoogleMap.OnMarkerClickListener() {
         @Override
         public boolean onMarkerClick(Marker marker) {
@@ -114,8 +124,10 @@ public class Clusterer<T extends Clusterable> {
             if (cluster != null) {
                 CameraUpdate update = CameraUpdateFactory.newLatLngBounds(cluster.getBounds(), CLUSTER_CENTER_PADDING);
                 googleMap.animateCamera(update, CAMERA_ANIMATION_DURATION, null);
+                listener.clusterClicked(cluster);
                 return true;
             }
+            listener.markerClicked(getClusterableFromMarker(marker));
             return false;
         }
     };
@@ -480,6 +492,13 @@ public class Clusterer<T extends Clusterable> {
 
     public interface OnCameraChangeListener {
         void onCameraChange(CameraPosition position);
+    }
+
+    public interface Listener<T extends Clusterable> {
+
+        void markerClicked(T marker);
+
+        void clusterClicked(Cluster position);
     }
 
 }
