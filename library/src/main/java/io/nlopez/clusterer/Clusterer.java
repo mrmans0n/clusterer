@@ -124,10 +124,14 @@ public class Clusterer<T extends Clusterable> {
             if (cluster != null) {
                 CameraUpdate update = CameraUpdateFactory.newLatLngBounds(cluster.getBounds(), CLUSTER_CENTER_PADDING);
                 googleMap.animateCamera(update, CAMERA_ANIMATION_DURATION, null);
-                listener.clusterClicked(cluster);
+                if (clustererClickListener != null) {
+                    clustererClickListener.clusterClicked(cluster);
+                }
                 return true;
             }
-            listener.markerClicked(getClusterableFromMarker(marker));
+            if (clustererClickListener != null) {
+                clustererClickListener.markerClicked(getClusterableFromMarker(marker));
+            }
             return false;
         }
     };
