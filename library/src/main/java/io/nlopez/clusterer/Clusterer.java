@@ -107,14 +107,14 @@ public class Clusterer<T extends Clusterable> {
         }
     };
 
-    private Listener listener;
+    private ClustererClickListener clustererClickListener;
 
-    public Listener getListener() {
-        return listener;
+    public ClustererClickListener getClustererClickListener() {
+        return clustererClickListener;
     }
 
-    public void setClustererListener(Listener listener) {
-        this.listener = listener;
+    public void setClustererListener(ClustererClickListener clustererClickListener) {
+        this.clustererClickListener = clustererClickListener;
     }
 
     GoogleMap.OnMarkerClickListener markerClicked = new GoogleMap.OnMarkerClickListener() {
@@ -494,7 +494,7 @@ public class Clusterer<T extends Clusterable> {
         void onCameraChange(CameraPosition position);
     }
 
-    public interface Listener<T extends Clusterable> {
+    public interface ClustererClickListener<T extends Clusterable> {
 
         void markerClicked(T marker);
 
