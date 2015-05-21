@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -100,6 +101,18 @@ public class MainActivity extends Activity {
             public void animateMarker(Marker marker, float interpolation) {
                 // Basic fading animation
                 marker.setAlpha(interpolation);
+            }
+        });
+
+        clusterer.setClustererListener(new Clusterer.ClustererClickListener<PointOfInterest>() {
+            @Override
+            public void markerClicked(PointOfInterest marker) {
+                Log.e("Clusterer", "marker clicked");
+            }
+
+            @Override
+            public void clusterClicked(Cluster position) {
+                Log.e("Clusterer", "cluster clicked");
             }
         });
 
