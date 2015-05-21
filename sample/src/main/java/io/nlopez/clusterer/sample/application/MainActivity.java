@@ -104,7 +104,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        clusterer.setClustererListener(new Clusterer.Listener<PointOfInterest>() {
+        clusterer.setClustererListener(new Clusterer.ClustererClickListener<PointOfInterest>() {
             @Override
             public void markerClicked(PointOfInterest marker) {
                 Log.e("Clusterer", "marker clicked");
