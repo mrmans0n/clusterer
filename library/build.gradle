@@ -16,7 +16,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 
-version '1.0.6-SNAPSHOT'
+version '1.0.6'
 group 'io.nlopez.clusterer'
 
 dependencies {
@@ -24,7 +24,7 @@ dependencies {
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     }
-    compile 'com.google.android.gms:play-services-location:7.3.0'
+    compile 'com.google.android.gms:play-services-location:7.5.0'
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:3.0-SNAPSHOT'
     testCompile 'org.robolectric:robolectric-shadows:3.0-SNAPSHOT'
